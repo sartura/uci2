@@ -1,0 +1,20 @@
+config dhcp
+	option zz 'lan'
+config net
+    option a "string"
+config dhcp 'lan'
+	option b "string"
+	list read '*'
+	list read 'ok'
+	list write '*'
+	list read 'a'
+config dhcp 'wan'
+	option b "string"
+	list read '*'
+	list read 'ok'
+	list write '*'
+	list read 'a'
+config dhcp
+	option c "another"
+config dhcp
+	option c "another_2"
