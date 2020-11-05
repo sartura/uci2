@@ -1,5 +1,53 @@
-# Created by https://www.toptal.com/developers/gitignore/api/c,cmake
-# Edit at https://www.toptal.com/developers/gitignore?templates=c,cmake
+
+# Created by https://www.gitignore.io/api/c,autotools
+# Edit at https://www.gitignore.io/?templates=c,autotools
+
+### Autotools ###
+# http://www.gnu.org/software/automake
+
+Makefile.in
+/ar-lib
+/mdate-sh
+/py-compile
+/test-driver
+/ylwrap
+
+# http://www.gnu.org/software/autoconf
+
+autom4te.cache
+/autoscan.log
+/autoscan-*.log
+/aclocal.m4
+/compile
+/config.guess
+/config.h.in
+/config.log
+/config.status
+/config.sub
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+
+# https://www.gnu.org/software/libtool/
+
+/ltmain.sh
+
+# http://www.gnu.org/software/texinfo
+
+/texinfo.tex
+
+# http://www.gnu.org/software/m4/
+
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+
+### Autotools Patch ###
 
 ### C ###
 # Prerequisites
@@ -55,21 +103,34 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-### CMake ###
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
+# End of https://www.gitignore.io/api/c,autotools
+### Vim ###
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
 
-### CMake Patch ###
-# External projects
-*-prefix/
+# Session
+Session.vim
 
-# End of https://www.toptal.com/developers/gitignore/api/c,cmake
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
+
+# End of https://www.gitignore.io/api/vim
+
+# dfranusic
+.ycm_extra_conf.pyc
+.ycm_extra_conf.py
+.vimrc
+.gutctags
+.clang-format
+AUTHORS
+VERSION
+CHANGELOG
