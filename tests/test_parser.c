@@ -133,6 +133,128 @@ static void test_cfg_unnamed(void **state) {
     uci2_free_ctx(ctx);
     free(fp);
 }
+/*
+NODE: @[0]
+  |--> CHILD: name
+  |--> CHILD: src
+  |--> CHILD: proto
+  |--> CHILD: dest_port
+  |--> CHILD: target
+  |--> CHILD: family
+NODE: @[1]
+  |--> CHILD: name
+  |--> CHILD: src
+  |--> CHILD: proto
+  |--> CHILD: icmp_type
+  |--> CHILD: family
+  |--> CHILD: target
+NODE: rule_X
+  |--> CHILD: name
+  |--> CHILD: src
+  |--> CHILD: proto
+  |--> CHILD: family
+  |--> CHILD: target
+NODE: @[2]
+  |--> CHILD: src
+  |--> CHILD: dest_port
+  |--> CHILD: target
+  |--> CHILD: proto
+*/
+
+static void test_iterators(void **state) {
+    cfg_root[cfg_root_sz] = 0;
+    char *fp = malloc(cfg_root_sz + 9);
+    strcpy(fp, cfg_root);
+    strcat(fp, "unnamed");
+    uci2_ctx_t *ctx = uci2_parse_file(fp);
+    assert_ptr_not_equal(ctx, NULL);
+    uci2_ast_t *n = uci2_q(ctx, "rule");
+    char *lst[] = {"@[2]", "rule_X", "@[1]", "@[0]"};
+    char *sub[4][6] = {
+        {"name", "src", "proto", "dest_port", "target", "family"},
+        {"name", "src", "proto", "icmp_type", "family", "target"},
+        {"name", "src", "proto", "family", "target", NULL},
+        {"src", "dest_port", "target", "proto", NULL, NULL}};
+
+    // *************** reverse ************8
+    // new iterator
+    uci2_iter_t *it = UCI2_IT_NEW(n);
+    it = UCI2_IT_LAST(it);
+    int i = 0;
+    // iterate
+    for (; !UCI2_IT_BEGIN(it); it = UCI2_IT_PREV(it)) {
+        // check
+        if (i >= 4) fail();
+        assert_string_equal(lst[i], UCI2_IT_NODE(it)->name);
+        ++i;
+    }
+    // free iterator
+    UCI2_IT_FREE(it);
+
+    // *************** forward ************8
+    // new iterator
+    it = UCI2_IT_NEW(n);
+    i = 0;
+    // iterate
+    for (; !UCI2_IT_END(it); it = UCI2_IT_NEXT(it)) {
+        // check
+        if (i >= 4) fail();
+        assert_string_equal(lst[3 - i], UCI2_IT_NODE(it)->name);
+        ++i;
+    }
+    // free iterator
+    UCI2_IT_FREE(it);
+
+
+    // *************** forward + sub-iterator ************8
+    // new iterator
+    it = UCI2_IT_NEW(n);
+    i = 0;
+    // iterate
+    for (; !UCI2_IT_END(it); it = UCI2_IT_NEXT(it)) {
+        // new sub-iterator
+        uci2_iter_t *it2 = UCI2_IT_NEW(UCI2_IT_NODE(it));
+        int j = 0;
+        // iterate
+        for (; !UCI2_IT_END(it2); it2 = UCI2_IT_NEXT(it2)) {
+            assert_string_equal(sub[i][j], UCI2_IT_NODE(it2)->name);
+            ++j;
+        }
+        // free sub-iterator
+        UCI2_IT_FREE(it2);
+        // check
+        if (i >= 4) fail();
+        ++i;
+    }
+    // free iterator
+    UCI2_IT_FREE(it);
+
+    // *************** reverse + sub-iterator ************8
+    // new iterator
+    it = UCI2_IT_NEW(n);
+    it = UCI2_IT_LAST(it);
+    i = 0;
+    // iterate
+    for (; !UCI2_IT_BEGIN(it); it = UCI2_IT_PREV(it)) {
+        // new sub-iterator
+        uci2_iter_t *it2 = UCI2_IT_NEW(UCI2_IT_NODE(it));
+        int j = 0;
+        // iterate
+        for (; !UCI2_IT_END(it2); it2 = UCI2_IT_NEXT(it2)) {
+            assert_string_equal(sub[3 - i][j], UCI2_IT_NODE(it2)->name);
+            ++j;
+        }
+        // free sub-iterator
+        UCI2_IT_FREE(it2);
+        // check
+        if (i >= 4) fail();
+        ++i;
+    }
+    // free iterator
+    UCI2_IT_FREE(it);
+    uci2_free_ctx(ctx);
+    free(fp);
+}
 
 static int group_setup(void **state) {
     return 0;
@@ -158,7 +280,8 @@ int main(int argc, char *argv[]) {
         cmocka_unit_test(test_cfg_rpcd),
         cmocka_unit_test(test_cfg_system),
         cmocka_unit_test(test_cfg_unnamed),
-        cmocka_unit_test(test_cfg_wireless)};
+        cmocka_unit_test(test_cfg_wireless),
+        cmocka_unit_test(test_iterators)};
 
     // results of group testing
     return cmocka_run_group_tests(test_groups, group_setup, group_tearDown);

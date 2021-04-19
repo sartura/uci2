@@ -36,13 +36,6 @@ int main(int argc, char **argv) {
     uci2_add_I(ctx, n_lst, "11.8.8.2/24");
     uci2_add_I(ctx, n_lst, "12.8.8.2/24");
 
-    // iterate the list
-    uci2_iter(n_lst, li) {
-        // print out just for fun
-        printf("List [%s], value = [%s]\n", n_lst->name, li->name);
-    }
-    printf("\n");
-
     // add global section (unnamed type)
     uci2_n_t *n_g = uci2_add_T(ctx, R, "globals");
     // add options to globals

@@ -254,11 +254,9 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
  *
  * @param[in]       n       Pointer to parent node chose child nodes
  *                          should be iterated
- * @param[in]       c       Name of pointer used to point to each child
- *                          of parent node; this pointer is updated in
- *                          each iteration
+ * @param[in]       d       Node depth
  */
-#define uci2_iter(n, c) uci2_ast_iter(n, c)
+#define uci2_iter(n, d) uci2_ast_iter(n, d)
 
 /**
  * Change node 'n' value part to 'nv' string

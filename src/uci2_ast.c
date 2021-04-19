@@ -10,6 +10,58 @@
 
 char UCI2_AST_PATH_SEP = 0x1d;
 
+
+uci2_iter_t *uci2_iter_begin(uci2_iter_t *it){
+    if (it->np == &it->n[0])
+        return it;
+    else
+        return NULL;
+}
+
+uci2_iter_t *uci2_iter_end(uci2_iter_t *it){
+    if (it->n[0] == NULL && it->n[1] == NULL && it->n_nr == 2) return it;
+    if (it->np == &it->n[it->n_nr - 1])
+        return it;
+    else
+        return NULL;
+}
+
+uci2_iter_t *uci2_iter_prev(uci2_iter_t *it){
+    if(*it->np) it->np--;
+    return it;
+}
+
+uci2_iter_t *uci2_iter_next(uci2_iter_t *it){
+    if(*it->np) it->np++;
+    return it;
+}
+
+uci2_iter_t *uci2_iter_first(uci2_iter_t *it){
+    it->np = &it->n[1];
+    return it;
+}
+
+uci2_iter_t *uci2_iter_last(uci2_iter_t *it){
+    it->np = &it->n[1];
+    while(*it->np != NULL) it->np++;
+    --it->np;
+    return it;
+}
+
+uci2_iter_t *uci2_iter_new(uci2_ast_t *n){
+    if(!n) return NULL;
+    uci2_iter_t *it = calloc(1,
+                             sizeof(uci2_iter_t) +
+                             sizeof(uci2_ast_t *) * (n->ch_nr + 2));
+    it->n_nr = n->ch_nr + 2;
+    if(n->ch_nr > 0) {
+        memcpy(&it->n[1], n->ch, sizeof(uci2_ast_t *) * n->ch_nr);
+        it->np = &it->n[1];
+    }
+    // last elem already a NULL pointer (calloc)
+    return it;
+}
+
 uci2_ast_t *uci2_new_ast(int nt, char *name, char *value) {
     uci2_ast_t *a = malloc(sizeof(uci2_ast_t));
     a->nt = nt;
