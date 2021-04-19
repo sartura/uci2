@@ -198,8 +198,8 @@ config rule
 * `uci2_iter(parent, item)`
     * This helper macro is used for iterating the child nodes of `parent` and setting the `item` pointer for each consecutive child node. Instead of writing the following: 
 
-* `int uci2_str2bool(str)`
-    * Returns boolean value of a given string. True value is returned if the `str` param matches any of the following values: `enabled`, `1`, `true`, `yes`, and `on`.
+* `int uci2_str2bool(str, bool)`
+    * Returns boolean value of a given string. The output `bool` argument will be set to `true` if the `str` value matches any of the following strings: `1`, `yes`, `on`, `true`, and `enabled`. Conversely, if the `str` value matches `0`, `no`, `false`, or `disabled`, the output `bool` argument will be set to `false`.
 ```c
 for(int i = 0; i<parent->ch_nr; i++){
     uci2_n_t* item = parent->ch[i];

@@ -158,18 +158,40 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx, uci2_ast_t *p, int nt,
     return nn;
 }
 
-int uci2_str2bool(char *str) {
-    const char *true_vals[] = {
-        "true",
-        "enabled",
-        "1",
-        "yes",
-        "on"
-    };
-    for (int i = 0; i < 5; i++)
-        if (strcmp(str, true_vals[i]) == 0) return 1;
+int uci2_str2bool(const char *string_value, bool *boolean_value) {
+    int error = 0;
 
-    return 0;
+    if (string_value == NULL) {
+        error = -1;
+        goto error_out;
+    }
+
+    if (boolean_value == NULL) {
+        error = -1;
+        goto error_out;
+    }
+
+    if (strcmp(string_value, "0") == 0 || strcmp(string_value, "no") == 0 ||
+        strcmp(string_value, "off") == 0 ||
+        strcmp(string_value, "false") == 0 ||
+        strcmp(string_value, "disabled") == 0) {
+        *boolean_value = false;
+    } else if (strcmp(string_value, "1") == 0 ||
+               strcmp(string_value, "yes") == 0 ||
+               strcmp(string_value, "on") == 0 ||
+               strcmp(string_value, "true") == 0 ||
+               strcmp(string_value, "enabled") == 0) {
+        *boolean_value = true;
+    } else {
+        error = -1;
+        goto error_out;
+    }
+
+    goto out;
+
+error_out:
+out:
+    return error ? -1 : 0;
 }
 
 uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...) {

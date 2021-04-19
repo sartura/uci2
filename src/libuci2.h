@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <uci2_ast.h>
 #include <string.h>
 
@@ -75,16 +76,12 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx, uci2_ast_t *p, int nt,
 /**
  * Converts string value to a boolean value
  *
- * @param[in]       str     String value
+ * @param[in]       string_value    Input string value
+ * @param[out]      boolean_value   Output boolean value
  *
- * @return          true if the given value matches any of the following
- *                  strings: 'true',
- *                           'enabled',
- *                           '1',
- *                           'yes',
- *                           'on'
+ * @return          0 for success or error code
  */
-int uci2_str2bool(char *str);
+int uci2_str2bool(const char *string_value, bool *boolean_value);
 
 /**
  * Export AST tree to output stream in configuration file
