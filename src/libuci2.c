@@ -148,9 +148,9 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx, uci2_ast_t *p, int nt,
     // validate child - parent relationship
     if (validate_parent(nt, p->nt)) return NULL;
     // new node
-    uci2_ast_t *nn = uci2_new_ast_rc(nt, 
-                                     strdup(n), 
-                                     (v ? strdup(v) : NULL), 
+    uci2_ast_t *nn = uci2_new_ast_rc(nt,
+                                     strdup(n),
+                                     (v ? strdup(v) : NULL),
                                      ctx->pool);
     // link to parent
     uci2_ast_add_ch(p, nn);
@@ -194,6 +194,42 @@ out:
     return error ? -1 : 0;
 }
 
+uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *section_type, const char *section_name, const char *option_name) {
+	uci2_ast_t *option = NULL;
+	uci2_ast_t *section = NULL;
+
+	if (ctx == NULL) {
+		return NULL;
+	}
+
+	if (section_type == NULL) {
+		return NULL;
+	}
+
+	if (section_name == NULL) {
+		return NULL;
+	}
+
+	if (option_name == NULL) {
+		return NULL;
+	}
+
+	option = uci2_q(ctx, section_type, section_name, option_name);
+	if (option == NULL) {
+		section = uci2_q(ctx, section_type, section_name);
+		if (section == NULL) {
+			return NULL;
+		}
+
+		option = uci2_add_O(ctx, section, (char *) option_name, NULL);
+		if (option == NULL) {
+			return NULL;
+		}
+	}
+
+	return option;
+}
+
 uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...) {
     // va args
     va_list ap;
@@ -229,15 +265,15 @@ uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...) {
 /**
  * Export option (O) or List (L) node
  *
- * @param[in]   n       Pointer to options or 
- *                      list node 
+ * @param[in]   n       Pointer to options or
+ *                      list node
  * @param[out]  out     Output stream
  */
 static void export_opt_lst(uci2_n_t *n, FILE *out) {
     // Option (O)
     if (n->nt == UCI2_NT_OPTION) {
         // name = value
-        fprintf(out, "%*soption %s '%s'\n", 
+        fprintf(out, "%*soption %s '%s'\n",
                 UCI2_INDENT, "", n->name, n->value);
 
         // List (L)
@@ -249,7 +285,7 @@ static void export_opt_lst(uci2_n_t *n, FILE *out) {
             // skip deleted
             if (!li->parent) continue;
             // name = value
-            fprintf(out, "%*slist %s '%s'\n", 
+            fprintf(out, "%*slist %s '%s'\n",
                     UCI2_INDENT, "", n->name, li->name);
         }
     }
@@ -260,7 +296,7 @@ static void export_opt_lst(uci2_n_t *n, FILE *out) {
  * option (O) or List (L) node
  *
  * @param[in]   n       Pointer to parent node
- *                      containing options and/or 
+ *                      containing options and/or
  *                      lists
  * @param[out]  out     Output stream
  */

@@ -27,7 +27,7 @@ typedef uci2_parser_ctx_t uci2_ctx_t;
 /**
  * Parse configuration file
  *
- * @param[in]       fname   Pointer to configuration 
+ * @param[in]       fname   Pointer to configuration
  *                          filename path
  *
  * @return          Pointer to parser result structure
@@ -84,6 +84,20 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx, uci2_ast_t *p, int nt,
 int uci2_str2bool(const char *string_value, bool *boolean_value);
 
 /**
+ * Get the option if it exists
+ * or create the option if it doesn't exist
+ *
+ * @param[in]       ctx             Context pointer
+ * @param[in]       section_type    Section type
+ * @param[in]       section_name    Section name
+ * @param[in]       option_name     Option name
+ *
+ * @return          Pointer to AST node representing an option
+ *                  or NULL if errors occurred
+ */
+uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *section_type, const char *section_name, const char *option_name);
+
+/**
  * Export AST tree to output stream in configuration file
  * format.
  *
@@ -123,7 +137,7 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
  * @param[in]       n       List node (L)
  * @param[in]       i       Index of node's item (I)
  *
- * @return          Pointer to list item or NULL if index is out 
+ * @return          Pointer to list item or NULL if index is out
  *                  of bounds or 'n' type is not UCI2_NT_LIST
  */
 #define uci2_q_L(n, i) \
@@ -133,7 +147,7 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
  * Get child count for node
  *
  * @param[in]       n       Node pointer
- * 
+ *
  * @return          Child count for node 'n'
  */
 #define uci2_nc(n) n->ch_nr
@@ -205,7 +219,7 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
 
 /**
  * Add Options AST node (O)
- * 
+ *
  * @param[in]       ctx     Parser context pointer
  * @param[in]       p       Parent node pointer
  * @param[in]       n       String used for node's name
