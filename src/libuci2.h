@@ -53,6 +53,15 @@ void uci2_free_ctx(uci2_parser_ctx_t *p);
 uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...);
 
 /**
+ * Get AST node based on query path (variadic va_list)
+ * @param[in]   cfg     Pointer to parser result data
+ * @param[in]   ...     Node query string; combined arguments
+ *
+ * @return      AST node that matches the query path
+ */
+uci2_ast_t *uci2_get_node_va_list(uci2_parser_ctx_t *cfg, va_list ap);
+
+/**
  * Create new parser context
  *
  * @return      Pointer to new parser context
@@ -88,14 +97,15 @@ int uci2_str2bool(const char *string_value, bool *boolean_value);
  * or create the option if it doesn't exist
  *
  * @param[in]       ctx             Context pointer
- * @param[in]       section_type    Section type
- * @param[in]       section_name    Section name
  * @param[in]       option_name     Option name
+ * @param[in]       ...             Section path
  *
  * @return          Pointer to AST node representing an option
  *                  or NULL if errors occurred
  */
-uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *section_type, const char *section_name, const char *option_name);
+uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, 
+                                      const char *option_name, 
+                                      ...);
 
 /**
  * Export AST tree to output stream in configuration file
@@ -228,6 +238,19 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
  * @return          Pointer to newly created node
  */
 #define uci2_add_O(ctx, p, n, v) uci2_add_node(ctx, p, UCI2_NT_OPTION, n, v)
+
+/**
+ * Add Options AST node (O)
+ *
+ * @param[in]       ctx     Parser context pointer
+ * @param[in]       o       Option name
+ * @param[in]       ...     Parent path
+ *
+ * @return          Pointer to newly created node
+ */
+#define uci2_get_or_create_O(ctx, o, ...)                          \
+    uci2_get_or_create_option(ctx, o, UCI2_AST_ROOT, UCI2_AST_CFG, \
+                              __VA_ARGS__, NULL)
 
 /**
  * Add Section AST node (S)

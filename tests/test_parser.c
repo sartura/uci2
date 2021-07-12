@@ -256,6 +256,24 @@ static void test_iterators(void **state) {
     free(fp);
 }
 
+static void test_modifiers(void **state) {
+    cfg_root[cfg_root_sz] = 0;
+    char *fp = malloc(cfg_root_sz + 7);
+    strcpy(fp, cfg_root);
+    strcat(fp, "unnamed");
+    uci2_ctx_t *ctx = uci2_parse_file(fp);
+    assert_ptr_not_equal(ctx, NULL);
+    uci2_ast_t *o = uci2_get_or_create_O(ctx, "name", "rule", "rule_X");
+    assert_ptr_not_equal(o, NULL);
+    assert_string_equal(o->value, "Allow-IGMP"); 
+    o = uci2_get_or_create_O(ctx, "new_name", "rule", "rule_X");
+    assert_ptr_not_equal(o, NULL);
+    assert_ptr_equal(o->value, NULL); 
+    uci2_free_ctx(ctx);
+    free(fp);
+
+}
+
 static int group_setup(void **state) {
     return 0;
 }
@@ -281,7 +299,8 @@ int main(int argc, char *argv[]) {
         cmocka_unit_test(test_cfg_system),
         cmocka_unit_test(test_cfg_unnamed),
         cmocka_unit_test(test_cfg_wireless),
-        cmocka_unit_test(test_iterators)};
+        cmocka_unit_test(test_iterators),
+        cmocka_unit_test(test_modifiers)};
 
     // results of group testing
     return cmocka_run_group_tests(test_groups, group_setup, group_tearDown);

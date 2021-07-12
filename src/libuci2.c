@@ -194,40 +194,62 @@ out:
     return error ? -1 : 0;
 }
 
-uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *section_type, const char *section_name, const char *option_name) {
-	uci2_ast_t *option = NULL;
-	uci2_ast_t *section = NULL;
+uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *option_name, ...) {
+    uci2_ast_t *option = NULL;
+    uci2_ast_t *section = NULL;
+    va_list ap;
 
-	if (ctx == NULL) {
-		return NULL;
-	}
+    // canity checks
+    if (!ctx) return NULL;
+    if (!option_name) return NULL;
 
-	if (section_type == NULL) {
-		return NULL;
-	}
+    // get section (parent of option node)
+    va_start(ap, option_name);
+    section = uci2_get_node_va_list(ctx, ap);
+    va_end(ap);
+    
+    // check if section exists
+    if (!section) return NULL;
 
-	if (section_name == NULL) {
-		return NULL;
-	}
+    // find option node
+    option = uci2_ast_get(section, option_name);
 
-	if (option_name == NULL) {
-		return NULL;
-	}
+    // option node missing
+    if (!option) {
+        // add empty optionis node
+        option = uci2_add_O(ctx, section, (char *)option_name, NULL);
+        if (!option) return NULL;
+    }
+    // return option node (newly created or already present)
+    return option;
+}
 
-	option = uci2_q(ctx, section_type, section_name, option_name);
-	if (option == NULL) {
-		section = uci2_q(ctx, section_type, section_name);
-		if (section == NULL) {
-			return NULL;
-		}
+uci2_ast_t *uci2_get_node_va_list(uci2_parser_ctx_t *cfg, va_list ap) {
+    // count how many (last has to be NULL)
+    int l = 0, tl = 0, pc = 0;
+    char *arg;
+    char *tmp = NULL;
+    // loop va args  (until last NULL arg)
+    while ((arg = va_arg(ap, char *))) {
+        // add to tmp str
+        pc++;
+        l = strlen(arg);
+        tmp = realloc(tmp, tl + l + 2);
+        // copy arg + 0x1d delimiter
+        memcpy(&tmp[tl], arg, l);
+        memcpy(&tmp[tl + l], &UCI2_AST_PATH_SEP, 1);
+        // inc total l
+        tl += l + 1;
+    }
+    // -1 will overwrite last 0x1d which is not needed
+    tmp[tl - 1] = 0;
+    // find node
+    uci2_ast_t *res = uci2_ast_get(cfg->ast, tmp);
+    // free tmp
+    free(tmp);
+    // return res
+    return res;
 
-		option = uci2_add_O(ctx, section, (char *) option_name, NULL);
-		if (option == NULL) {
-			return NULL;
-		}
-	}
-
-	return option;
 }
 
 uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...) {
