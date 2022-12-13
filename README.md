@@ -1,4 +1,6 @@
 # UCI2 User's guide
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsartura%2Fuci2.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsartura%2Fuci2?ref=badge_shield)
+
 
 ### The building blocks of UCI2 configuration system
 
@@ -457,3 +459,7 @@ void uci2_change_name(n, nn);
  */
 void uci2_del(n);
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsartura%2Fuci2.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsartura%2Fuci2?ref=badge_large)
