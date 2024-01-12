@@ -57,3 +57,6 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
+INCLUDE(Dart)
+find_program(MEMORYCHECK_COMMAND NAMES valgrind)
+set(MEMORYCHECK_COMMAND_OPTIONS "--error-exitcode=1 --leak-check=full --show-leak-kinds=all --leak-resolution=high --track-origins=yes --read-var-info=yes  --child-silent-after-fork=yes")
