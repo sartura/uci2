@@ -25,6 +25,19 @@ As mentioned earlier, configuration comprise only a few node types:
     * List item node is a member, or a direct child of **[L]** List node. It correlates to the value part of   [**OpenWrt's list lines**](https://openwrt.org/docs/guide-user/base-system/uci#uci_dataobject_model)
 
 
+### Building UCI2
+cd /path/to/uci2/
+mkdir build && cd build
+cmake ..
+
+### Enabling Tests with build
+cd /path/to/uci2/
+mkdir build && cd build
+cmake -DENABLE_TESTS=ON ..
+
+### Installing UCI2
+sudo make install
+
 ### Configuration file handling
 Original **/etc/system configuration** file:
 ```
@@ -235,6 +248,24 @@ uci2_parser_ctx_t *uci2_parse_file(const char *fname);
 void uci2_free_ctx(uci2_parser_ctx_t *p);
 
 /**
+ * Get AST node based on query path (variadic)
+ * @param[in]   cfg     Pointer to parser result data
+ * @param[in]   ...     Node query string; combined arguments
+ *
+ * @return      AST node that matches the query path
+ */
+uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...);
+
+/**
+ * Get AST node based on query path (variadic va_list)
+ * @param[in]   cfg     Pointer to parser result data
+ * @param[in]   ...     Node query string; combined arguments
+ *
+ * @return      AST node that matches the query path
+ */
+uci2_ast_t *uci2_get_node_va_list(uci2_parser_ctx_t *cfg, va_list ap);
+
+/**
  * Create new parser context
  *
  * @return      Pointer to new parser context
@@ -257,6 +288,21 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx,
 			  int nt,
                           char *n, 
                           char *v);
+
+/**
+ * Get the option if it exists
+ * or create the option if it doesn't exist
+ *
+ * @param[in]       ctx             Context pointer
+ * @param[in]       option_name     Option name
+ * @param[in]       ...             Section path
+ *
+ * @return          Pointer to AST node representing an option
+ *                  or NULL if errors occurred
+ */
+uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, 
+                                      const char *option_name, 
+                                      ...);
 
 /**
  * Export AST to output stream in configuration file
@@ -388,6 +434,17 @@ uci2_ast_t *uci2_add_T(ctx, p, n);
 uci2_ast_t *uci2_add_O(ctx, p, n, v);
 
 /**
+ * Add Options AST node (O)
+ *
+ * @param[in]       ctx     Parser context pointer
+ * @param[in]       o       Option name
+ * @param[in]       ...     Parent path
+ *
+ * @return          Pointer to newly created node
+ */
+uci2_ast_t *uci2_get_or_create_O(ctx, o, ...)
+
+/**
  * Add Section AST node (S)
  *
  * @param[in]       ctx     Parser context pointer
@@ -423,7 +480,7 @@ uci2_ast_t *uci2_add_I(ctx, p, n);
 /**
  * Iterate child nodes of 'n', access each child with 'c' pointer
  *
- * @param[in]       n       Pointer to parent node chose child nodes
+ * @param[in]       n       Pointer to parent node whose child nodes
  *                          should be iterated
  * @param[in]       c       Name of pointer used to point to each child
  *                          of parent node; this pointer is updated in
