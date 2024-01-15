@@ -100,7 +100,7 @@ uci2_ast_t *uci2_ast_add_ch(uci2_ast_t *p, uci2_ast_t *c) {
 void uci2_ast_free(uci2_ast_t *n, int fc) {
     if (!n) return;
     if (fc) {
-        for (int i = 0; i < n->ch_nr; i++)
+        for (size_t i = 0; i < n->ch_nr; i++)
             uci2_ast_free(n->ch[i], 1);
         free(n->ch);
     }
@@ -112,8 +112,8 @@ void uci2_ast_free(uci2_ast_t *n, int fc) {
 void uci2_ast_free_rc(uci2_ast_t *pool) {
     if (!pool) return;
     uci2_ast_t **children = pool->ch;
-    int cc = pool->ch_nr;
-    for (int i = 0; i < cc; i++) {
+    size_t cc = pool->ch_nr;
+    for (size_t i = 0; i < cc; i++) {
         uci2_ast_t *c = children[i];
         UCI2_FN(c->name);
         UCI2_FN(c->value);
@@ -190,7 +190,7 @@ void uci2_ast_print(FILE *out, uci2_ast_t *n, int depth) {
     // next line
     fprintf(out, "\n");
     // process children
-    for (int i = 0; i < n->ch_nr; i++) {
+    for (size_t i = 0; i < n->ch_nr; i++) {
         uci2_ast_print(out, n->ch[i], nd);
     }
 }
@@ -211,7 +211,7 @@ static uci2_ast_t *cfg_ast_get(uci2_ast_t *n, const char *name, bool cc) {
     if (cc) {
         // children
         uci2_ast_t **c = n->ch;
-        for (int i = 0; i < n->ch_nr; i++) {
+        for (size_t i = 0; i < n->ch_nr; i++) {
             // process child and stop if match found
             uci2_ast_t *child = c[i];
             // match child's name
@@ -272,7 +272,7 @@ void uci2_ast_set_indexes(uci2_ast_t *root) {
     }
     // children
     uci2_ast_t **c = root->ch;
-    for (int i = 0; i < root->ch_nr; i++) {
+    for (size_t i = 0; i < root->ch_nr; i++) {
         // process child and stop if match found
         uci2_ast_t *child = c[i];
         // check if index needs to be updates
