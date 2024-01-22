@@ -26,21 +26,25 @@ As mentioned earlier, configuration comprise only a few node types:
 
 
 ### Building UCI2
+```
 cd /path/to/uci2/
-```
 mkdir build && cd build
-```
 cmake ..
+make
+```
 
-### Enabling Tests with build
+### Building UCI2 with tests enabled
+```
 cd /path/to/uci2/
-```
 mkdir build && cd build
-```
 cmake -DENABLE_TESTS=ON ..
+make
+```
 
 ### Installing UCI2
+```
 sudo make install
+```
 
 ### Configuration file handling
 Original **/etc/system configuration** file:
