@@ -22,13 +22,20 @@
  */
 static char *fs_read_txt_file(const char *fname) {
     // check if file
-    struct stat ps = {};
+    struct stat ps = {0};
     stat(fname, &ps);
     if (!S_ISREG(ps.st_mode)) return NULL;
     FILE *f = fopen(fname, "r");
     if (!f) return 0;
     fseek(f, 0, SEEK_END);
-    size_t fsize = ftell(f);
+    size_t fsize;
+    long curr_offset = ftell(f);
+    if (curr_offset == -1) {
+        fclose(f);
+        return NULL;
+    }
+    fsize = (size_t)curr_offset;
+
     fseek(f, 0, SEEK_SET);
     if (fsize == 0) {
         fclose(f);
@@ -79,7 +86,7 @@ void uci2_free_ctx(uci2_parser_ctx_t *p) {
     free(p);
 }
 
-uci2_parser_ctx_t *uci2_new_ctx() {
+uci2_parser_ctx_t *uci2_new_ctx(void) {
     // mem
     uci2_parser_ctx_t *ctx = malloc(sizeof(uci2_parser_ctx_t));
     // init ref/pool
@@ -226,7 +233,7 @@ uci2_ast_t *uci2_get_or_create_option(uci2_parser_ctx_t *ctx, const char *option
 
 uci2_ast_t *uci2_get_node_va_list(uci2_parser_ctx_t *cfg, va_list ap) {
     // count how many (last has to be NULL)
-    int l = 0, tl = 0, pc = 0;
+    size_t l = 0, tl = 0, pc = 0;
     char *arg;
     char *tmp = NULL;
     // loop va args  (until last NULL arg)
@@ -257,7 +264,7 @@ uci2_ast_t *uci2_get_node_va(uci2_parser_ctx_t *cfg, ...) {
     va_list ap;
     va_start(ap, cfg);
     // count how many (last has to be NULL)
-    int l = 0, tl = 0, pc = 0;
+    size_t l = 0, tl = 0, pc = 0;
     char *arg;
     char *tmp = NULL;
     // loop va args  (until last NULL arg)
@@ -301,7 +308,7 @@ static void export_opt_lst(uci2_n_t *n, FILE *out) {
         // List (L)
     } else if (n->nt == UCI2_NT_LIST) {
         // print list items (I)
-        for (int j = 0; j < n->ch_nr; j++) {
+        for (size_t j = 0; j < n->ch_nr; j++) {
             // node pointer
             uci2_n_t *li = n->ch[j];
             // skip deleted
@@ -324,7 +331,7 @@ static void export_opt_lst(uci2_n_t *n, FILE *out) {
  */
 static void export_opts_lsts(uci2_n_t *s, FILE *out) {
     // loop options, and lists
-    for (int i = 0; i < s->ch_nr; i++) {
+    for (size_t i = 0; i < s->ch_nr; i++) {
         // node pointer
         uci2_n_t *n = s->ch[i];
         // skip deleted
@@ -342,7 +349,7 @@ static void export_opts_lsts(uci2_n_t *s, FILE *out) {
  */
 static void export_type(uci2_n_t *s, FILE *out) {
     // loop sections
-    for (int i = 0; i < s->ch_nr; i++) {
+    for (size_t i = 0; i < s->ch_nr; i++) {
         // node pointer
         uci2_n_t *n = s->ch[i];
         // skip deleted
@@ -379,7 +386,7 @@ int uci2_export_ctx(uci2_parser_ctx_t *ctx, FILE *out) {
     uci2_n_t *r = UCI2_CFG_ROOT(ctx);
     if (!r) return -2;
     // loop types (T)
-    for (int i = 0; i < r->ch_nr; i++) {
+    for (size_t i = 0; i < r->ch_nr; i++) {
         // node pointer
         uci2_n_t *n = r->ch[i];
         // skip deleted

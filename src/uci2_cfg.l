@@ -1,12 +1,14 @@
 %{
 #include <stdio.h>
 #include "uci2_parser.h"
-char* uci_unq(char* str, int l);
+char* uci_unq(char* str, size_t l);
 char* uci_regex_unq(char* str, int l);
 %}
 
 %option noyywrap reentrant bison-bridge
 %option outfile="uci2_lexer.c" header-file="uci2_lexer.h"
+%option nounput
+%option noinput
 
 newline              \n
 ws                   [ \t]
@@ -91,7 +93,7 @@ type_timeserver      "timeserver"
 {ws}*               ;
 {option}            { BEGIN(ST_VALUE); return OPTION; }
 {list}              { BEGIN(ST_VALUE); return LIST; }
-<ST_VALUE>{value}   { yylval->str = uci_unq(yytext, yyleng); return VALUE; }
+<ST_VALUE>{value}   { yylval->str = uci_unq(yytext, (size_t)yyleng); return VALUE; }
 {config}            { BEGIN(ST_VALUE); return CONFIG; }
 {package}           { BEGIN(ST_VALUE); return PACKAGE; }
 
@@ -103,7 +105,7 @@ type_timeserver      "timeserver"
 // * In the case of a tie, use the pattern that appears first in the program
 
 // basic unquote method
-char* uci_unq(char* str, int l){
+char* uci_unq(char* str, size_t l){
     // if not quoted, just duplicate
     if(l < 2) return strdup(str);
     // if no starting quotes, duplicate
@@ -127,7 +129,11 @@ char* uci_itos(int num){
     if(s > 0) return res;
     return 0;
 #else
-    int l = snprintf(NULL, 0, "%d", num);
+    int pbytes = snprintf(NULL, 0, "%d", num);
+    size_t l;
+    if (pbytes < 0)
+    	return 0;
+    l = (size_t)pbytes;
     char* res = malloc(l + 1);
     if(!res) return 0;
     snprintf(res, l + 1, "%d", num);

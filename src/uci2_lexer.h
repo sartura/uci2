@@ -503,7 +503,7 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 99 "uci2_cfg.l"
+#line 101 "uci2_cfg.l"
 
 
 #line 510 "uci2_lexer.h"

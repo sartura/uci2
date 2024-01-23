@@ -66,7 +66,7 @@ uci2_ast_t *uci2_get_node_va_list(uci2_parser_ctx_t *cfg, va_list ap);
  *
  * @return      Pointer to new parser context
  */
-uci2_parser_ctx_t *uci2_new_ctx();
+uci2_parser_ctx_t *uci2_new_ctx(void);
 
 /**
  * Add new AST node to AST tree
