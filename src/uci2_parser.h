@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.3.2.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_UCI2_PARSER_H_INCLUDED
 # define YY_YY_UCI2_PARSER_H_INCLUDED
@@ -44,39 +45,46 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 63 "uci2_cfg.y" /* yacc.c:1921  */
+#line 63 "uci2_cfg.y"
 
     #include <uci2_ast.h>
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
     typedef void* yyscan_t;
+#endif
 
-#line 53 "uci2_parser.h" /* yacc.c:1921  */
+#line 57 "uci2_parser.h"
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    VALUE = 258,
-    CONFIG = 259,
-    OPTION = 260,
-    LIST = 261,
-    PACKAGE = 262
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    VALUE = 258,                   /* VALUE  */
+    CONFIG = 259,                  /* CONFIG  */
+    OPTION = 260,                  /* OPTION  */
+    LIST = 261,                    /* LIST  */
+    PACKAGE = 262                  /* PACKAGE  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
 union YYSTYPE
 {
-#line 84 "uci2_cfg.y" /* yacc.c:1921  */
+#line 87 "uci2_cfg.y"
 
     char* str;
     uci2_ast_t* node;
 
-#line 78 "uci2_parser.h" /* yacc.c:1921  */
-};
+#line 86 "uci2_parser.h"
 
+};
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -84,6 +92,8 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
+
 int yyparse (yyscan_t* scanner, uci2_parser_ctx_t* ctx);
+
 
 #endif /* !YY_YY_UCI2_PARSER_H_INCLUDED  */

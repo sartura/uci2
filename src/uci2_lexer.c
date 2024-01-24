@@ -480,11 +480,12 @@ static const flex_int16_t yy_chk[131] =
 #line 2 "uci2_cfg.l"
 #include <stdio.h>
 #include "uci2_parser.h"
-char* uci_unq(char* str, int l);
+char* uci_unq(char* str, size_t l);
 char* uci_regex_unq(char* str, int l);
 #line 486 "uci2_lexer.c"
+#define YY_NO_INPUT 1
 
-#line 488 "uci2_lexer.c"
+#line 489 "uci2_lexer.c"
 
 #define INITIAL 0
 #define ST_VALUE 1
@@ -597,8 +598,6 @@ extern int yywrap ( yyscan_t yyscanner );
 #endif
 
 #ifndef YY_NO_UNPUT
-    
-    static void yyunput ( int c, char *buf_ptr  , yyscan_t yyscanner);
     
 #endif
 
@@ -759,9 +758,9 @@ YY_DECL
 		}
 
 	{
-#line 88 "uci2_cfg.l"
+#line 90 "uci2_cfg.l"
 
-#line 765 "uci2_lexer.c"
+#line 764 "uci2_lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -821,55 +820,55 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 89 "uci2_cfg.l"
+#line 91 "uci2_cfg.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 90 "uci2_cfg.l"
+#line 92 "uci2_cfg.l"
 ; 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 91 "uci2_cfg.l"
+#line 93 "uci2_cfg.l"
 ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 92 "uci2_cfg.l"
+#line 94 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return OPTION; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 93 "uci2_cfg.l"
+#line 95 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return LIST; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 94 "uci2_cfg.l"
-{ yylval->str = uci_unq(yytext, yyleng); return VALUE; }
+#line 96 "uci2_cfg.l"
+{ yylval->str = uci_unq(yytext, (size_t)yyleng); return VALUE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 95 "uci2_cfg.l"
+#line 97 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return CONFIG; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 96 "uci2_cfg.l"
+#line 98 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return PACKAGE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 98 "uci2_cfg.l"
+#line 100 "uci2_cfg.l"
 { return 1; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 99 "uci2_cfg.l"
+#line 101 "uci2_cfg.l"
 ECHO;
 	YY_BREAK
-#line 873 "uci2_lexer.c"
+#line 872 "uci2_lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ST_VALUE):
 	yyterminate();
@@ -1209,44 +1208,6 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 }
 
 #ifndef YY_NO_UNPUT
-
-    static void yyunput (int c, char * yy_bp , yyscan_t yyscanner)
-{
-	char *yy_cp;
-    struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
-    yy_cp = yyg->yy_c_buf_p;
-
-	/* undo effects of setting up yytext */
-	*yy_cp = yyg->yy_hold_char;
-
-	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-		{ /* need to shift things up to make room */
-		/* +2 for EOB chars. */
-		int number_to_move = yyg->yy_n_chars + 2;
-		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
-					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		char *source =
-				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
-
-		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
-			*--dest = *--source;
-
-		yy_cp += (int) (dest - source);
-		yy_bp += (int) (dest - source);
-		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			yyg->yy_n_chars = (int) YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
-
-		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-			YY_FATAL_ERROR( "flex scanner push-back overflow" );
-		}
-
-	*--yy_cp = (char) c;
-
-	yyg->yytext_ptr = yy_bp;
-	yyg->yy_hold_char = *yy_cp;
-	yyg->yy_c_buf_p = yy_cp;
-}
 
 #endif
 
@@ -2051,7 +2012,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 99 "uci2_cfg.l"
+#line 101 "uci2_cfg.l"
 
 
 // How Flex Handles Ambiguous Patterns (config and value)
@@ -2059,7 +2020,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 // * In the case of a tie, use the pattern that appears first in the program
 
 // basic unquote method
-char* uci_unq(char* str, int l){
+char* uci_unq(char* str, size_t l){
     // if not quoted, just duplicate
     if(l < 2) return strdup(str);
     // if no starting quotes, duplicate
@@ -2083,7 +2044,11 @@ char* uci_itos(int num){
     if(s > 0) return res;
     return 0;
 #else
-    int l = snprintf(NULL, 0, "%d", num);
+    int pbytes = snprintf(NULL, 0, "%d", num);
+    size_t l;
+    if (pbytes < 0)
+    	return 0;
+    l = (size_t)pbytes;
     char* res = malloc(l + 1);
     if(!res) return 0;
     snprintf(res, l + 1, "%d", num);

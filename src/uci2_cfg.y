@@ -23,13 +23,13 @@ char* uci_itos(int num);
         a->ch_un_nr = b->ch_un_nr;                               \
         b->ch = NULL;                                            \
         b->ch_nr = 0;                                            \
-        for (int i = 0; i < a->ch_nr; i++) a->ch[i]->parent = a; \
+        for (size_t _i1 = 0; _i1 < a->ch_nr; _i1++) a->ch[_i1]->parent = a; \
     } while (0)
 
 // add children from b to a, just set pointer, shallow copy
 #define AST_ADDCH(a, b)                                                  \
     do {                                                                 \
-        for (int i = 0; i < b->ch_nr; i++) uci2_ast_add_ch(a, b->ch[i]); \
+        for (size_t _i2 = 0; _i2 < b->ch_nr; _i2++) uci2_ast_add_ch(a, b->ch[_i2]); \
     } while (0)
 
 // crate new AST (ref counted) a with parent p, type t, name n 
@@ -44,11 +44,11 @@ char* uci_itos(int num);
 // this is used for type (T) and list (L) nodes (I)
 #define AST_MERGE(lst, t)                              \
     do {                                               \
-        for (int i = 0; i < lst->ch_nr; i++) {         \
-            uci2_ast_t* n = lst->ch[i];                \
+        for (size_t _i3 = 0; _i3 < lst->ch_nr; _i3++) {         \
+            uci2_ast_t* n = lst->ch[_i3];                \
             if (n->nt != t) continue;                  \
-            for (int j = i + 1; j < lst->ch_nr; j++) { \
-                uci2_ast_t* n2 = lst->ch[j];           \
+            for (size_t _j1 = _i3 + 1; _j1 < lst->ch_nr; _j1++) { \
+                uci2_ast_t* n2 = lst->ch[_j1];           \
                 if (strcmp(n2->name, n->name) == 0) {  \
                     AST_ADDCH(n, n2);                  \
                     n2->ch_nr = 0;                     \
@@ -62,7 +62,10 @@ char* uci_itos(int num);
 
 %code requires {
     #include <uci2_ast.h>
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
     typedef void* yyscan_t;
+#endif
 }
 
 /* bison options */

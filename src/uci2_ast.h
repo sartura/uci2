@@ -141,7 +141,7 @@ struct uci2_ast {
     /** Array of child AST nodes */
     uci2_ast_t **ch;
     /** Number of children in ch array */
-    int ch_nr;
+    size_t ch_nr;
     /* Number of unnamed children in ch array */
     int ch_un_nr;
 };
@@ -161,7 +161,7 @@ struct uci2_iter {
     /** pointer to the current sibling node */
     uci2_ast_t **np;
     /** sibling node count */
-    int n_nr;
+    size_t n_nr;
     /** an array of sibling nodes to be iterated */
     uci2_ast_t *n[];
 };
