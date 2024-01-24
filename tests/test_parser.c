@@ -7,7 +7,7 @@
 #include <string.h>
 
 // global parser context
-uci2_ctx_t* ctx = NULL;
+uci2_ctx_t* g_ctx = NULL;
 char* cfg_root;
 size_t cfg_root_sz;
 
