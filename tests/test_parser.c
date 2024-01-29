@@ -320,7 +320,7 @@ static int group_tearDown(void **state) {
 
 int main(int argc, char *argv[]) {
     // set cfg root
-    cfg_root = strdup(argv[1]);
+    cfg_root = strdup("./");
     cfg_root_sz = strlen(cfg_root);
     // define tests
     const struct CMUnitTest test_groups[] = {
