@@ -293,10 +293,11 @@ static void test_iterators(void **state) {
 }
 
 static void test_modifiers(void **state) {
+    const char *unm_str = "unnamed";
     cfg_root[cfg_root_sz] = 0;
-    char *fp = malloc(cfg_root_sz + 7);
+    char *fp = malloc(cfg_root_sz + strlen(unm_str) + 1);
     strcpy(fp, cfg_root);
-    strcat(fp, "unnamed");
+    strcat(fp, unm_str);
     uci2_ctx_t *ctx = uci2_parse_file(fp);
     assert_ptr_not_equal(ctx, NULL);
     uci2_ast_t *o = uci2_get_or_create_O(ctx, "name", "rule", "rule_X");
@@ -319,6 +320,7 @@ static int group_tearDown(void **state) {
 }
 
 int main(int argc, char *argv[]) {
+    int ret = 0;
     // set cfg root
     cfg_root = strdup("./");
     cfg_root_sz = strlen(cfg_root);
@@ -339,7 +341,12 @@ int main(int argc, char *argv[]) {
         cmocka_unit_test(test_modifiers)};
 
     // results of group testing
-    return cmocka_run_group_tests(test_groups, group_setup, group_tearDown);
+    ret = cmocka_run_group_tests(test_groups, group_setup, group_tearDown);
+
+    if (cfg_root)
+	    free(cfg_root);
+
+    return ret;
 }
 
 bool validate_name_value_indx(uci2_ast_t *parent_n, size_t *indx, char *p_nname, char *p_val) {
