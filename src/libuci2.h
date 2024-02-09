@@ -287,15 +287,6 @@ int uci2_export_ctx_fsync(uci2_parser_ctx_t *ctx, const char* fp);
 #define uci2_add_I(ctx, p, n) uci2_add_node(ctx, p, UCI2_NT_LIST_ITEM, n, NULL)
 
 /**
- * Iterate child nodes of 'n', access each child with 'c' pointer
- *
- * @param[in]       n       Pointer to parent node chose child nodes
- *                          should be iterated
- * @param[in]       d       Node depth
- */
-#define uci2_iter(n, d) uci2_ast_iter(n, d)
-
-/**
  * Change node 'n' value part to 'nv' string
  *
  * @param[in]       n       Pointer to node whose value member

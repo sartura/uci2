@@ -102,8 +102,6 @@ if(!ctx) return 1;
 uci2_free_ctx(ctx);
 ```
 
-
-
 #### Creating new configuration structure from scratch
 Unlike previous example, the following case assumes the absence of configuration file on the file system and generating one from scratch is the only option.  Both examples are quite similar, the only difference is the `uci2_new_ctx()` method which doesn't require any arguments, but creates the internal structure and prepares it for further addition of various nodes.
 ```c
@@ -179,7 +177,7 @@ config rule
 	option target		ACCEPT
 
 ```
-	 
+
 * `char *uci2_get_value(n)`
     *  This method returns the **value** of node **n**. The only node type that uses the **value** part of node structure is the **options [0]** node.
 
@@ -214,25 +212,11 @@ config rule
     * Add **list item** node, also known as **[I]** node,  using `ctx` context, `p` as a parent node, and `n` as the node name in form of NULL terminated string. This method return a pointer to newly created node; the parent node `p` supported by this method is **[L]** node.
 
 * `void uci2_del(n)`
-    * Flag node `n` as deleted. All "deleted" nodes are still present in memory and are freed when parser context is freed by invoking the `uci2_free_ctx(ctx)` method.
-
-* `uci2_iter(parent, item)`
-    * This helper macro is used for iterating the child nodes of `parent` and setting the `item` pointer for each consecutive child node. Instead of writing the following: 
+    * Flag node `n` as deleted. All "deleted" nodes are still present in memory and are freed when parser context is freed by invoking the `uci2_free_ctx(ctx)` method.    
 
 * `int uci2_str2bool(str, bool)`
     * Returns boolean value of a given string. The output `bool` argument will be set to `true` if the `str` value matches any of the following strings: `1`, `yes`, `on`, `true`, and `enabled`. Conversely, if the `str` value matches `0`, `no`, `false`, or `disabled`, the output `bool` argument will be set to `false`.
-```c
-for(int i = 0; i<parent->ch_nr; i++){
-    uci2_n_t* item = parent->ch[i];
-}
-```
-You can use the short version by using the following syntax:
-```c
-uci2_iter(parent, item){
-  // print out just for fun
-  printf("Node type = [%d]\n", item->nt);
-}
-```
+    
 
 ### Method documentation (also found in **libuci2.h**)
 ```c
@@ -296,6 +280,16 @@ uci2_ast_t *uci2_add_node(uci2_parser_ctx_t *ctx,
 			  int nt,
                           char *n, 
                           char *v);
+
+/**
+ * Converts string value to a boolean value
+ *
+ * @param[in]       string_value    Input string value
+ * @param[out]      boolean_value   Output boolean value
+ *
+ * @return          0 for success or error code
+ */
+int uci2_str2bool(const char *string_value, bool *boolean_value);
 
 /**
  * Get the option if it exists
@@ -484,17 +478,6 @@ uci2_ast_t *uci2_add_L(ctx, p, n);
  * @return          Pointer to newly created node
  */
 uci2_ast_t *uci2_add_I(ctx, p, n);
-
-/**
- * Iterate child nodes of 'n', access each child with 'c' pointer
- *
- * @param[in]       n       Pointer to parent node whose child nodes
- *                          should be iterated
- * @param[in]       c       Name of pointer used to point to each child
- *                          of parent node; this pointer is updated in
- *                          each iteration
- */
-void uci2_iter(n, c);
 
 /**
  * Change node 'n' value part to 'nv' string
