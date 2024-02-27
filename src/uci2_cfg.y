@@ -6,9 +6,8 @@
 #include "uci2_lexer.h"
 
 // external functions
-extern int yylex(YYSTYPE * lvalp, yyscan_t scanner);
-extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t* ctx, const char*);
-char* uci_itos(int num);
+extern int yylex(YYSTYPE *lvalp, yyscan_t scanner);
+extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t *ctx, const char *string);
 
 // ** macros to make BNF more readable **
 // see uci2_new_ast_rc header documentation
@@ -32,11 +31,10 @@ char* uci_itos(int num);
         for (size_t _i2 = 0; _i2 < b->ch_nr; _i2++) uci2_ast_add_ch(a, b->ch[_i2]); \
     } while (0)
 
-// crate new AST (ref counted) a with parent p, type t, name n 
-// and value v
+// create new AST (ref counted) a with parent p, type t, name n and value v
 #define AST_NP(t, n, v, p)                                   \
     do {                                                     \
-        uci2_ast_t* a = uci2_new_ast_rc(t, n, v, ctx->pool); \
+        uci2_ast_t *a = uci2_new_ast_rc(t, n, v, ctx->pool); \
         uci2_ast_add_ch(p, a);                               \
     } while (0)
 
@@ -45,10 +43,10 @@ char* uci_itos(int num);
 #define AST_MERGE(lst, t)                              \
     do {                                               \
         for (size_t _i3 = 0; _i3 < lst->ch_nr; _i3++) {         \
-            uci2_ast_t* n = lst->ch[_i3];                \
+            uci2_ast_t *n = lst->ch[_i3];                \
             if (n->nt != t) continue;                  \
             for (size_t _j1 = _i3 + 1; _j1 < lst->ch_nr; _j1++) { \
-                uci2_ast_t* n2 = lst->ch[_j1];           \
+                uci2_ast_t *n2 = lst->ch[_j1];           \
                 if (strcmp(n2->name, n->name) == 0) {  \
                     AST_ADDCH(n, n2);                  \
                     n2->ch_nr = 0;                     \
@@ -64,7 +62,7 @@ char* uci_itos(int num);
     #include <uci2_ast.h>
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-    typedef void* yyscan_t;
+    typedef void *yyscan_t;
 #endif
 }
 
@@ -73,9 +71,9 @@ char* uci_itos(int num);
 %defines "uci2_parser.h"
 %define api.pure full
 %define parse.error verbose
-%lex-param   { yyscan_t* scanner }
-%parse-param { yyscan_t* scanner }
-%parse-param { uci2_parser_ctx_t* ctx }
+%lex-param   { yyscan_t *scanner }
+%parse-param { yyscan_t *scanner }
+%parse-param { uci2_parser_ctx_t *ctx }
 
 /* initial action when parser starts */
 %initial-action {
@@ -85,19 +83,19 @@ char* uci_itos(int num);
 
 /* token types */
 %union {
-    char* str;
-    uci2_ast_t* node;
+    char *string;
+    uci2_ast_t *node;
 }
 
 /* terminal symbols (tokens) */
-%token <str>    VALUE
+%token <string>    VALUE
 %token          CONFIG OPTION LIST PACKAGE
 
 /* non terminal symbol types */
 %type <node>    config options option lines line root package
 
 /* free string memory for discarded symbols (strdup in lex) */
-%destructor { free($$); } VALUE 
+%destructor { free($$); } VALUE
 
 /* set root node */
 %start root
@@ -175,7 +173,7 @@ options : option {  $$ = AST_NRC(UCI2_NT_SECTION, 0, 0); AST_ACH($$, $1);  }
 
 /* section option or list */
 option : OPTION VALUE VALUE {  $$ = AST_NRC(UCI2_NT_OPTION, $2, $3);  }
-       | LIST VALUE VALUE {  $$ = AST_NRC(UCI2_NT_LIST, $2, 0); 
+       | LIST VALUE VALUE {  $$ = AST_NRC(UCI2_NT_LIST, $2, 0);
                              // add list value as new node
                              AST_NP(UCI2_NT_LIST_ITEM, $3, 0, $$);
                           }

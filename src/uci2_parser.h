@@ -45,12 +45,12 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 63 "uci2_cfg.y"
+#line 61 "uci2_cfg.y"
 
     #include <uci2_ast.h>
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-    typedef void* yyscan_t;
+    typedef void *yyscan_t;
 #endif
 
 #line 57 "uci2_parser.h"
@@ -77,10 +77,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 87 "uci2_cfg.y"
+#line 85 "uci2_cfg.y"
 
-    char* str;
-    uci2_ast_t* node;
+    char *string;
+    uci2_ast_t *node;
 
 #line 86 "uci2_parser.h"
 
@@ -93,7 +93,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int yyparse (yyscan_t* scanner, uci2_parser_ctx_t* ctx);
+int yyparse (yyscan_t *scanner, uci2_parser_ctx_t *ctx);
 
 
 #endif /* !YY_YY_UCI2_PARSER_H_INCLUDED  */

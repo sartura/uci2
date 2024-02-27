@@ -1,6 +1,6 @@
-#line 2 "uci2_lexer.c"
+#line 1 "uci2_lexer.c"
 
-#line 4 "uci2_lexer.c"
+#line 3 "uci2_lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -480,12 +480,11 @@ static const flex_int16_t yy_chk[131] =
 #line 2 "uci2_cfg.l"
 #include <stdio.h>
 #include "uci2_parser.h"
-char* uci_unq(char* str, size_t l);
-char* uci_regex_unq(char* str, int l);
-#line 486 "uci2_lexer.c"
+char *uci_unquote(char *string, int string_size);
+#line 484 "uci2_lexer.c"
 #define YY_NO_INPUT 1
 
-#line 489 "uci2_lexer.c"
+#line 487 "uci2_lexer.c"
 
 #define INITIAL 0
 #define ST_VALUE 1
@@ -758,9 +757,9 @@ YY_DECL
 		}
 
 	{
-#line 90 "uci2_cfg.l"
+#line 22 "uci2_cfg.l"
 
-#line 764 "uci2_lexer.c"
+#line 762 "uci2_lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -820,55 +819,55 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 91 "uci2_cfg.l"
+#line 23 "uci2_cfg.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 92 "uci2_cfg.l"
-; 
+#line 24 "uci2_cfg.l"
+;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 93 "uci2_cfg.l"
+#line 25 "uci2_cfg.l"
 ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 94 "uci2_cfg.l"
+#line 26 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return OPTION; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 95 "uci2_cfg.l"
+#line 27 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return LIST; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 96 "uci2_cfg.l"
-{ yylval->str = uci_unq(yytext, (size_t)yyleng); return VALUE; }
+#line 28 "uci2_cfg.l"
+{ yylval->string = uci_unquote(yytext, yyleng); return VALUE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 97 "uci2_cfg.l"
+#line 29 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return CONFIG; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 98 "uci2_cfg.l"
+#line 30 "uci2_cfg.l"
 { BEGIN(ST_VALUE); return PACKAGE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 100 "uci2_cfg.l"
+#line 32 "uci2_cfg.l"
 { return 1; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 101 "uci2_cfg.l"
+#line 33 "uci2_cfg.l"
 ECHO;
 	YY_BREAK
-#line 872 "uci2_lexer.c"
+#line 870 "uci2_lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ST_VALUE):
 	yyterminate();
@@ -2012,7 +2011,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 101 "uci2_cfg.l"
+#line 33 "uci2_cfg.l"
 
 
 // How Flex Handles Ambiguous Patterns (config and value)
@@ -2020,45 +2019,29 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 // * In the case of a tie, use the pattern that appears first in the program
 
 // basic unquote method
-char* uci_unq(char* str, size_t l){
-    // if not quoted, just duplicate
-    if(l < 2) return strdup(str);
-    // if no starting quotes, duplicate
-    if (!(str[0] == 0x27 || str[0] == 0x22)) return strdup(str);
-    // i no end quotes, duplicate
-    if (!(str[l - 1] == 0x27 || str[l - 1] == 0x22)) return strdup(str);
-    // l - 2 quotes + 1 NULL
-    char* res = malloc(l - 1);
-    // skip first and last quotes and NULL
-    memcpy(res, str + 1, l - 2);
-    // NULL
-    res[l - 2] = 0;
-    return res;
-}
+char *uci_unquote(char *string, int string_size)
+{
+    char *result = NULL;
 
-// int to str
-char* uci_itos(int num){
-#ifdef _GNU_SOURCE
-    char* res;
-    int s = asprintf(&res, "%d", num);
-    if(s > 0) return res;
-    return 0;
-#else
-    int pbytes = snprintf(NULL, 0, "%d", num);
-    size_t l;
-    if (pbytes < 0)
-    	return 0;
-    l = (size_t)pbytes;
-    char* res = malloc(l + 1);
-    if(!res) return 0;
-    snprintf(res, l + 1, "%d", num);
-    return res;
-#endif
+	if (string_size >= 2 && ((string[0] == '\'' && string[string_size - 1] == '\'') || (string[0] == '"' && string[string_size - 1] == '"'))) {
+		result = calloc((size_t) (string_size - 1), sizeof(char));
+		memcpy(result, string + 1, (size_t) (string_size - 2));
+		result[string_size - 2] = '\0';
+	} else if (string_size >= 0) {
+		result = calloc((size_t) (string_size + 1), sizeof(char));
+		memcpy(result, string, (size_t) string_size);
+		result[string_size] = '\0';
+	} else {
+        result = NULL;
+    }
+
+	return result;
 }
 
 // yyerror
-void yyerror(yyscan_t scanner, uci2_parser_ctx_t* ctx, const char* str){
+extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t *ctx, const char *string)
+{
     // no error output
-    // printf("%s\n", str);
+    // printf("%s\n", string);
 }
 

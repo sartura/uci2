@@ -73,9 +73,8 @@
 #include "uci2_lexer.h"
 
 // external functions
-extern int yylex(YYSTYPE * lvalp, yyscan_t scanner);
-extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t* ctx, const char*);
-char* uci_itos(int num);
+extern int yylex(YYSTYPE *lvalp, yyscan_t scanner);
+extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t *ctx, const char *string);
 
 // ** macros to make BNF more readable **
 // see uci2_new_ast_rc header documentation
@@ -99,11 +98,10 @@ char* uci_itos(int num);
         for (size_t _i2 = 0; _i2 < b->ch_nr; _i2++) uci2_ast_add_ch(a, b->ch[_i2]); \
     } while (0)
 
-// crate new AST (ref counted) a with parent p, type t, name n 
-// and value v
+// create new AST (ref counted) a with parent p, type t, name n and value v
 #define AST_NP(t, n, v, p)                                   \
     do {                                                     \
-        uci2_ast_t* a = uci2_new_ast_rc(t, n, v, ctx->pool); \
+        uci2_ast_t *a = uci2_new_ast_rc(t, n, v, ctx->pool); \
         uci2_ast_add_ch(p, a);                               \
     } while (0)
 
@@ -112,10 +110,10 @@ char* uci_itos(int num);
 #define AST_MERGE(lst, t)                              \
     do {                                               \
         for (size_t _i3 = 0; _i3 < lst->ch_nr; _i3++) {         \
-            uci2_ast_t* n = lst->ch[_i3];                \
+            uci2_ast_t *n = lst->ch[_i3];                \
             if (n->nt != t) continue;                  \
             for (size_t _j1 = _i3 + 1; _j1 < lst->ch_nr; _j1++) { \
-                uci2_ast_t* n2 = lst->ch[_j1];           \
+                uci2_ast_t *n2 = lst->ch[_j1];           \
                 if (strcmp(n2->name, n->name) == 0) {  \
                     AST_ADDCH(n, n2);                  \
                     n2->ch_nr = 0;                     \
@@ -126,7 +124,7 @@ char* uci_itos(int num);
         }                                              \
     } while (0)
 
-#line 130 "uci2_parser.c"
+#line 128 "uci2_parser.c"
 
 
 
@@ -559,8 +557,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   108,   108,   119,   133,   137,   138,   142,   146,   159,
-     172,   173,   177,   178
+       0,   106,   106,   117,   131,   135,   136,   140,   144,   157,
+     170,   171,   175,   176
 };
 #endif
 
@@ -740,7 +738,7 @@ do {                                                                      \
 
 static void
 yy_symbol_value_print (FILE *yyo,
-                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t* scanner, uci2_parser_ctx_t* ctx)
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t *scanner, uci2_parser_ctx_t *ctx)
 {
   FILE *yyoutput = yyo;
   YY_USE (yyoutput);
@@ -760,7 +758,7 @@ yy_symbol_value_print (FILE *yyo,
 
 static void
 yy_symbol_print (FILE *yyo,
-                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t* scanner, uci2_parser_ctx_t* ctx)
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t *scanner, uci2_parser_ctx_t *ctx)
 {
   YYFPRINTF (yyo, "%s %s (",
              yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
@@ -799,7 +797,7 @@ do {                                                            \
 
 static void
 yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
-                 int yyrule, yyscan_t* scanner, uci2_parser_ctx_t* ctx)
+                 int yyrule, yyscan_t *scanner, uci2_parser_ctx_t *ctx)
 {
   int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1128,7 +1126,7 @@ yysyntax_error (YYPTRDIFF_T *yymsg_alloc, char **yymsg,
 
 static void
 yydestruct (const char *yymsg,
-            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, yyscan_t* scanner, uci2_parser_ctx_t* ctx)
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, yyscan_t *scanner, uci2_parser_ctx_t *ctx)
 {
   YY_USE (yyvaluep);
   YY_USE (scanner);
@@ -1141,9 +1139,9 @@ yydestruct (const char *yymsg,
   switch (yykind)
     {
     case YYSYMBOL_VALUE: /* VALUE  */
-#line 100 "uci2_cfg.y"
-            { free(((*yyvaluep).str)); }
-#line 1147 "uci2_parser.c"
+#line 98 "uci2_cfg.y"
+            { free(((*yyvaluep).string)); }
+#line 1145 "uci2_parser.c"
         break;
 
       default:
@@ -1162,7 +1160,7 @@ yydestruct (const char *yymsg,
 `----------*/
 
 int
-yyparse (yyscan_t* scanner, uci2_parser_ctx_t* ctx)
+yyparse (yyscan_t *scanner, uci2_parser_ctx_t *ctx)
 {
 /* Lookahead token kind.  */
 int yychar;
@@ -1223,13 +1221,13 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
 
 
 /* User initialization code.  */
-#line 81 "uci2_cfg.y"
+#line 79 "uci2_cfg.y"
 {
     ctx->ast = 0;
     ctx->pool = uci2_new_ast(UCI2_NT_ROOT, 0, 0);
 }
 
-#line 1233 "uci2_parser.c"
+#line 1231 "uci2_parser.c"
 
   goto yysetstate;
 
@@ -1430,7 +1428,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* root: lines  */
-#line 108 "uci2_cfg.y"
+#line 106 "uci2_cfg.y"
              {  (yyval.node) = AST_NRC(UCI2_NT_ROOT, strdup(UCI2_AST_ROOT), 0);
                 ctx->ast = (yyval.node);
                 // create cfg node
@@ -1442,11 +1440,11 @@ yyreduce:
                 // set indexes
                 uci2_ast_set_indexes((yyval.node));
              }
-#line 1446 "uci2_parser.c"
+#line 1444 "uci2_parser.c"
     break;
 
   case 3: /* root: package lines  */
-#line 119 "uci2_cfg.y"
+#line 117 "uci2_cfg.y"
                         {  (yyval.node) = AST_NRC(UCI2_NT_ROOT, strdup(UCI2_AST_ROOT), 0);
                            ctx->ast = (yyval.node);
                            // package
@@ -1459,36 +1457,36 @@ yyreduce:
                            AST_MERGE((yyval.node)->ch[1], UCI2_NT_TYPE);
 
                         }
-#line 1463 "uci2_parser.c"
+#line 1461 "uci2_parser.c"
     break;
 
   case 4: /* package: PACKAGE VALUE  */
-#line 133 "uci2_cfg.y"
-                        {  (yyval.node) = AST_NRC(UCI2_NT_PACKAGE, strdup(UCI2_AST_PKG), (yyvsp[0].str));  }
-#line 1469 "uci2_parser.c"
+#line 131 "uci2_cfg.y"
+                        {  (yyval.node) = AST_NRC(UCI2_NT_PACKAGE, strdup(UCI2_AST_PKG), (yyvsp[0].string));  }
+#line 1467 "uci2_parser.c"
     break;
 
   case 5: /* lines: line  */
-#line 137 "uci2_cfg.y"
+#line 135 "uci2_cfg.y"
              {  (yyval.node) = AST_NRC(UCI2_NT_ROOT, 0, 0); AST_ACH((yyval.node), (yyvsp[0].node));  }
-#line 1475 "uci2_parser.c"
+#line 1473 "uci2_parser.c"
     break;
 
   case 6: /* lines: lines line  */
-#line 138 "uci2_cfg.y"
+#line 136 "uci2_cfg.y"
                    {  AST_ACH((yyvsp[-1].node), (yyvsp[0].node));  }
-#line 1481 "uci2_parser.c"
+#line 1479 "uci2_parser.c"
     break;
 
   case 7: /* line: config  */
-#line 142 "uci2_cfg.y"
+#line 140 "uci2_cfg.y"
               {  (yyval.node) = (yyvsp[0].node);  }
-#line 1487 "uci2_parser.c"
+#line 1485 "uci2_parser.c"
     break;
 
   case 8: /* config: CONFIG VALUE options  */
-#line 146 "uci2_cfg.y"
-                              {  (yyval.node) = AST_NRC(UCI2_NT_TYPE, (yyvsp[-1].str), 0);
+#line 144 "uci2_cfg.y"
+                              {  (yyval.node) = AST_NRC(UCI2_NT_TYPE, (yyvsp[-1].string), 0);
                                  // ** un-named section **
                                  // create new AST for unnamed section (index for name)
                                  char tmp_buff[33];
@@ -1501,15 +1499,15 @@ yyreduce:
                                  // list node with list items
                                  AST_MERGE((yyval.node)->ch[0], UCI2_NT_LIST);
                               }
-#line 1505 "uci2_parser.c"
+#line 1503 "uci2_parser.c"
     break;
 
   case 9: /* config: CONFIG VALUE VALUE options  */
-#line 159 "uci2_cfg.y"
-                                    {  (yyval.node) = AST_NRC(UCI2_NT_TYPE, (yyvsp[-2].str), 0);
+#line 157 "uci2_cfg.y"
+                                    {  (yyval.node) = AST_NRC(UCI2_NT_TYPE, (yyvsp[-2].string), 0);
                                        // ** named section **
                                        // create new AST for section name
-                                       AST_NP(UCI2_NT_SECTION_NAME, (yyvsp[-1].str), 0, (yyval.node));
+                                       AST_NP(UCI2_NT_SECTION_NAME, (yyvsp[-1].string), 0, (yyval.node));
                                        // - use children from options
                                        // - both section and type present
                                        AST_MOVCH((yyval.node)->ch[0], (yyvsp[0].node));
@@ -1517,38 +1515,38 @@ yyreduce:
                                        // list node with list items
                                        AST_MERGE((yyval.node)->ch[0], UCI2_NT_LIST);
                                     }
-#line 1521 "uci2_parser.c"
+#line 1519 "uci2_parser.c"
     break;
 
   case 10: /* options: option  */
-#line 172 "uci2_cfg.y"
+#line 170 "uci2_cfg.y"
                  {  (yyval.node) = AST_NRC(UCI2_NT_SECTION, 0, 0); AST_ACH((yyval.node), (yyvsp[0].node));  }
-#line 1527 "uci2_parser.c"
+#line 1525 "uci2_parser.c"
     break;
 
   case 11: /* options: options option  */
-#line 173 "uci2_cfg.y"
+#line 171 "uci2_cfg.y"
                          {  AST_ACH((yyvsp[-1].node), (yyvsp[0].node));  }
-#line 1533 "uci2_parser.c"
+#line 1531 "uci2_parser.c"
     break;
 
   case 12: /* option: OPTION VALUE VALUE  */
-#line 177 "uci2_cfg.y"
-                            {  (yyval.node) = AST_NRC(UCI2_NT_OPTION, (yyvsp[-1].str), (yyvsp[0].str));  }
-#line 1539 "uci2_parser.c"
+#line 175 "uci2_cfg.y"
+                            {  (yyval.node) = AST_NRC(UCI2_NT_OPTION, (yyvsp[-1].string), (yyvsp[0].string));  }
+#line 1537 "uci2_parser.c"
     break;
 
   case 13: /* option: LIST VALUE VALUE  */
-#line 178 "uci2_cfg.y"
-                          {  (yyval.node) = AST_NRC(UCI2_NT_LIST, (yyvsp[-1].str), 0); 
+#line 176 "uci2_cfg.y"
+                          {  (yyval.node) = AST_NRC(UCI2_NT_LIST, (yyvsp[-1].string), 0);
                              // add list value as new node
-                             AST_NP(UCI2_NT_LIST_ITEM, (yyvsp[0].str), 0, (yyval.node));
+                             AST_NP(UCI2_NT_LIST_ITEM, (yyvsp[0].string), 0, (yyval.node));
                           }
-#line 1548 "uci2_parser.c"
+#line 1546 "uci2_parser.c"
     break;
 
 
-#line 1552 "uci2_parser.c"
+#line 1550 "uci2_parser.c"
 
       default: break;
     }
@@ -1772,5 +1770,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 184 "uci2_cfg.y"
+#line 182 "uci2_cfg.y"
 
