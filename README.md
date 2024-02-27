@@ -3,7 +3,7 @@
 ### The building blocks of UCI2 configuration system
 
 #### AST parser context
-Every configuration file, once read from the filesystem, gets parsed and converted to AST parser context. The tree itself uses a system of reference counting, and all nodes are kept track of. When node based tree structure is no longer needed, all nodes comprising the loaded configuration file are freed by invoking the`uci2_free_ctx`  method. Context based parsing, unlike global variables, enables users to work on multiple files simultaneously. UCI2 library was built from the ground up with [**reentrancy**](https://en.wikipedia.org/wiki/Reentrancy_(computing)) in mind.
+Every configuration file, once read from the filesystem, gets parsed and converted to AST parser context. The tree itself uses a system of reference counting, and all nodes are kept track of. When node based tree structure is no longer needed, all nodes comprising the loaded configuration file are freed by invoking the `uci2_free_ctx` method. Context based parsing, unlike global variables, enables users to work on multiple files simultaneously. UCI2 library was built from the ground up with [**reentrancy**](https://en.wikipedia.org/wiki/Reentrancy_(computing)) in mind.
 
 #### Abstract Syntax Tree (AST)
 [OpenWrt's configuration file syntax](https://openwrt.org/docs/guide-user/base-system/uci#file_syntax) consists of simple line based structures grouped by some keywords, some which are **config** and **list**. UCI2 library converts this flat file viewpoint to a more appropriate and useful form, a tree based structure also known as [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree).

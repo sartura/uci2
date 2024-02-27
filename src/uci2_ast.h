@@ -296,7 +296,7 @@ void uci2_ast_print(FILE *out, uci2_ast_t *n, int depth);
  *
  * - example 2: get interface wifi ipaddr
  *   ====================================================
- *   /@Cintarface/wifi/ipaddr
+ *   /@C/interface/wifi/ipaddr
  *
  *
  * @param[in]       root        Pointer to root AST node

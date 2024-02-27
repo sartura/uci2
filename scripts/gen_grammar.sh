@@ -1,5 +1,9 @@
-cd ../src
+#!/bin/bash
+
+set -e
+
+CURR_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd ${CURR_DIR}/../src
 flex uci2_cfg.l
 bison -d uci2_cfg.y
-cd - > /dev/null
 echo "Lexer and Parser successfully generated."
