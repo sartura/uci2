@@ -1,35 +1,37 @@
+package 'iterator'
+
 config rule
-	option name		Allow-DHCP-Renew
-	option src		wan
+	option name         Allow-DHCP-Renew
+	option src		    wan
 	option proto		udp
 	option dest_port	68
 	option target		ACCEPT
 	option family		ipv4
 
 config rule
-	option name		Allow-Ping
-	option src		wan
+	option name		    Allow-Ping
+	option src		    wan
 	option proto		icmp
 	option icmp_type	echo-request
 	option family		ipv4
 	option target		ACCEPT
 
 config rule 'rule_X'
-	option name		Allow-IGMP
-	option src		wan
+	option name		    Allow-IGMP
+	option src		    wan
 	option proto		igmp
 	option family		ipv4
 	option target		ACCEPT
 
 config rule
-        option src              wan
-        option dest_port        51820
-        option target           ACCEPT
-	option proto 		udp 
+    option src          wan
+    option dest_port    51820
+    option target       ACCEPT
+	option proto 	    udp
 
 config rule2
-	option name		Allow-DHCPv6
-	option src		wan
+	option name		    Allow-DHCPv6
+	option src		    wan
 	option proto		udp
 	option src_ip		fc00::/6
 	option dest_ip		fc00::/6
@@ -38,8 +40,8 @@ config rule2
 	option target		ACCEPT
 
 config rule2
-	option name		Allow-MLD
-	option src		wan
+	option name		    Allow-MLD
+	option src		    wan
 	option proto		icmp
 	option src_ip		fe80::/10
 	list icmp_type		'130/0'

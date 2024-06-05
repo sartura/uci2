@@ -10,51 +10,55 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 # include dir
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-# libuci2 library
+# uci2 library
+set(
+    SOURCE_FILES
+    src/uci2.c
+    src/ast.c
+    src/lexer.c
+    src/parser.c
+    src/utils/memory.c
+)
+
 add_library(
-    ${PROJECT_NAME}
+    uci2
     SHARED
-    src/libuci2.c
-    src/uci2_ast.c
-    src/uci2_lexer.c
-    src/uci2_parser.c
+    ${SOURCE_FILES}
+)
+
+add_library(
+    uci2_static
+    STATIC
+    ${SOURCE_FILES}
 )
 
 set_target_properties(
-    ${PROJECT_NAME}
+    uci2 uci2_static
     PROPERTIES
-    PUBLIC_HEADER
-    "src/uci2_ast.h;src/libuci2.h"
+    OUTPUT_NAME ${PROJECT_NAME}
 )
 
-# example programs
-add_executable(
-    example_check
-    src/examples/example_check.c
+set_target_properties(
+    uci2 uci2_static
+    PROPERTIES
+    PUBLIC_HEADER "src/uci2.h"
 )
 
-add_executable(
-    example_new
-    src/examples/example_new.c
-)
-
-# link examples
-target_link_libraries(
-    example_check
-    ${PROJECT_NAME}
-)
-
-target_link_libraries(
-    example_new
-    ${PROJECT_NAME}
-)
-
-# install libuci2
+# install uci2
 install(
     TARGETS
-    ${PROJECT_NAME}
+    uci2
     LIBRARY
-    DESTINATION lib ${CMAKE_INSTALL_LIBDIR}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER
+    DESTINATION include
+)
+
+install(
+    TARGETS
+    uci2_static
+    ARCHIVE
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER
     DESTINATION include
 )

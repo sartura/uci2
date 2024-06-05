@@ -1,0 +1,23 @@
+config system
+	option hostname "OpenWrt"
+	option timezone 'UTC'
+	option ttylogin 1
+	option log_size '64"
+	option log_port 514
+	option urandom_seed '0'
+
+config timeserver 'ntp'
+	option enabled true
+	# option commented '1'
+	option enable_server '0'
+	list server 0.openwrt.pool.ntp.org
+	list server '1.openwrt.pool.ntp.org'
+	# option commented '2'
+	list server "2.openwrt.pool.ntp.org"
+	list server '3.openwrt.pool.ntp.org'
+	# option commented "3"
+
+# config commented
+# 	option commented 1
+# 	option commented 2
+# 	option commented 3

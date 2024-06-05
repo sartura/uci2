@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_UCI2_PARSER_H_INCLUDED
-# define YY_YY_UCI2_PARSER_H_INCLUDED
+#ifndef YY_YY_PARSER_H_INCLUDED
+# define YY_YY_PARSER_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -45,15 +45,18 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 61 "uci2_cfg.y"
+#line 14 "uci2.y"
 
-    #include <uci2_ast.h>
+    #include "utils/memory.h"
+
+    #include "ast.h"
+
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
     typedef void *yyscan_t;
 #endif
 
-#line 57 "uci2_parser.h"
+#line 60 "parser.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -77,12 +80,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 85 "uci2_cfg.y"
+#line 40 "uci2.y"
 
     char *string;
-    uci2_ast_t *node;
+    ast_node_t *node;
 
-#line 86 "uci2_parser.h"
+#line 89 "parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -93,7 +96,7 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-int yyparse (yyscan_t *scanner, uci2_parser_ctx_t *ctx);
+int yyparse (yyscan_t *scanner, ast_t *ast);
 
 
-#endif /* !YY_YY_UCI2_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_H_INCLUDED  */

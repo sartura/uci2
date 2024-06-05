@@ -1,11 +1,14 @@
 %{
-#include <stdio.h>
-#include "uci2_parser.h"
-char *uci_unquote(char *string, int string_size);
+	#include <stdio.h>
+
+	#include "utils/memory.h"
+
+	#include "parser.h"
+	char *uci_unquote(char *string, int string_size);
 %}
 
 %option nounput noinput noyywrap reentrant bison-bridge
-%option outfile="uci2_lexer.c" header-file="uci2_lexer.h"
+%option outfile="lexer.c" header-file="lexer.h"
 
 newline              \n
 ws                   [ \t]
@@ -33,9 +36,9 @@ list                 "list"
 .                   { return 1; }
 %%
 
-// How Flex Handles Ambiguous Patterns (config and value)
-// * Match the longest possible string every time the scanner matches input
-// * In the case of a tie, use the pattern that appears first in the program
+// how Flex handles ambiguous patterns (config and value)
+// - match the longest possible string every time the scanner matches input
+// - in the case of a tie, use the pattern that appears first in the program
 
 // basic unquote method
 char *uci_unquote(char *string, int string_size)
@@ -43,11 +46,11 @@ char *uci_unquote(char *string, int string_size)
     char *result = NULL;
 
 	if (string_size >= 2 && ((string[0] == '\'' && string[string_size - 1] == '\'') || (string[0] == '"' && string[string_size - 1] == '"'))) {
-		result = calloc((size_t) (string_size - 1), sizeof(char));
+		result = xcalloc((size_t) (string_size - 1), sizeof(char));
 		memcpy(result, string + 1, (size_t) (string_size - 2));
 		result[string_size - 2] = '\0';
 	} else if (string_size >= 0) {
-		result = calloc((size_t) (string_size + 1), sizeof(char));
+		result = xcalloc((size_t) (string_size + 1), sizeof(char));
 		memcpy(result, string, (size_t) string_size);
 		result[string_size] = '\0';
 	} else {
@@ -58,8 +61,8 @@ char *uci_unquote(char *string, int string_size)
 }
 
 // yyerror
-extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t *ctx, const char *string)
+extern void yyerror(yyscan_t scanner, ast_t *ctx, const char *string)
 {
-    // no error output
-    // printf("%s\n", string);
+	// print error condition
+    fprintf(stderr, "yyerror: %s\n", string);
 }

@@ -2,9 +2,9 @@
 #define yyHEADER_H 1
 #define yyIN_HEADER 1
 
-#line 5 "uci2_lexer.h"
+#line 5 "lexer.h"
 
-#line 7 "uci2_lexer.h"
+#line 7 "lexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -503,9 +503,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 33 "uci2_cfg.l"
+#line 37 "uci2.l"
 
 
-#line 509 "uci2_lexer.h"
+#line 509 "lexer.h"
 #undef yyIN_HEADER
 #endif /* yyHEADER_H */

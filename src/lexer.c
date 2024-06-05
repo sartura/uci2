@@ -1,6 +1,6 @@
-#line 1 "uci2_lexer.c"
+#line 1 "lexer.c"
 
-#line 3 "uci2_lexer.c"
+#line 3 "lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -476,15 +476,18 @@ static const flex_int16_t yy_chk[131] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "uci2_cfg.l"
-#line 2 "uci2_cfg.l"
-#include <stdio.h>
-#include "uci2_parser.h"
-char *uci_unquote(char *string, int string_size);
-#line 484 "uci2_lexer.c"
+#line 1 "uci2.l"
+#line 2 "uci2.l"
+	#include <stdio.h>
+
+	#include "utils/memory.h"
+
+	#include "parser.h"
+	char *uci_unquote(char *string, int string_size);
+#line 487 "lexer.c"
 #define YY_NO_INPUT 1
 
-#line 487 "uci2_lexer.c"
+#line 490 "lexer.c"
 
 #define INITIAL 0
 #define ST_VALUE 1
@@ -757,9 +760,9 @@ YY_DECL
 		}
 
 	{
-#line 22 "uci2_cfg.l"
+#line 26 "uci2.l"
 
-#line 762 "uci2_lexer.c"
+#line 765 "lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -819,55 +822,55 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 23 "uci2_cfg.l"
+#line 27 "uci2.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "uci2_cfg.l"
+#line 28 "uci2.l"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "uci2_cfg.l"
+#line 29 "uci2.l"
 ;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "uci2_cfg.l"
+#line 30 "uci2.l"
 { BEGIN(ST_VALUE); return OPTION; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "uci2_cfg.l"
+#line 31 "uci2.l"
 { BEGIN(ST_VALUE); return LIST; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "uci2_cfg.l"
+#line 32 "uci2.l"
 { yylval->string = uci_unquote(yytext, yyleng); return VALUE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 29 "uci2_cfg.l"
+#line 33 "uci2.l"
 { BEGIN(ST_VALUE); return CONFIG; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 30 "uci2_cfg.l"
+#line 34 "uci2.l"
 { BEGIN(ST_VALUE); return PACKAGE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "uci2_cfg.l"
+#line 36 "uci2.l"
 { return 1; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 33 "uci2_cfg.l"
+#line 37 "uci2.l"
 ECHO;
 	YY_BREAK
-#line 870 "uci2_lexer.c"
+#line 873 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ST_VALUE):
 	yyterminate();
@@ -2011,12 +2014,12 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 33 "uci2_cfg.l"
+#line 37 "uci2.l"
 
 
-// How Flex Handles Ambiguous Patterns (config and value)
-// * Match the longest possible string every time the scanner matches input
-// * In the case of a tie, use the pattern that appears first in the program
+// how Flex handles ambiguous patterns (config and value)
+// - match the longest possible string every time the scanner matches input
+// - in the case of a tie, use the pattern that appears first in the program
 
 // basic unquote method
 char *uci_unquote(char *string, int string_size)
@@ -2024,11 +2027,11 @@ char *uci_unquote(char *string, int string_size)
     char *result = NULL;
 
 	if (string_size >= 2 && ((string[0] == '\'' && string[string_size - 1] == '\'') || (string[0] == '"' && string[string_size - 1] == '"'))) {
-		result = calloc((size_t) (string_size - 1), sizeof(char));
+		result = xcalloc((size_t) (string_size - 1), sizeof(char));
 		memcpy(result, string + 1, (size_t) (string_size - 2));
 		result[string_size - 2] = '\0';
 	} else if (string_size >= 0) {
-		result = calloc((size_t) (string_size + 1), sizeof(char));
+		result = xcalloc((size_t) (string_size + 1), sizeof(char));
 		memcpy(result, string, (size_t) string_size);
 		result[string_size] = '\0';
 	} else {
@@ -2039,9 +2042,9 @@ char *uci_unquote(char *string, int string_size)
 }
 
 // yyerror
-extern void yyerror(yyscan_t scanner, uci2_parser_ctx_t *ctx, const char *string)
+extern void yyerror(yyscan_t scanner, ast_t *ctx, const char *string)
 {
-    // no error output
-    // printf("%s\n", string);
+	// print error condition
+    fprintf(stderr, "yyerror: %s\n", string);
 }
 
