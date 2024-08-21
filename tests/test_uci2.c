@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <cmocka.h>
 
@@ -13,10 +14,10 @@
 #include "lexer.h"
 #include "uci2.h"
 
+#define CONFIG_DIRECTORY_PATH_TMP CONFIG_DIRECTORY_PATH "config/"
+
 static int setup(void **state);
 static int teardown(void **state);
-
-static int file_copy(const char *destination, const char *source);
 
 static void test_uci2_node_get(void **state);
 static void test_uci2_node_section_add(void **state);
@@ -46,134 +47,62 @@ static void test_uci2_string_to_boolean(void **state);
 static void test_uci2_config_parse_success(void **state);
 static void test_uci2_config_parse_error(void **state);
 static void test_uci2_config_file_change(void **state);
+static void test_uci2_ast_create(void **state);
+static void test_uci2_config_remove(void **state);
 static void test_uci2_node_iterator(void **state);
-
-static const char *source_test_file_path[] = {
-	"test_config_correct",
-	"test_config_incorrect",
-	"test_config_iterator",
-	NULL,
-};
-
-static const char *destination_test_file_path[] = {
-	"/etc/config/test_config_correct",
-	"/etc/config/test_config_incorrect",
-	"/etc/config/test_config_iterator",
-	"/etc/config/test_uci2_node_section_add_config",
-	"/etc/config/test_uci2_node_option_add_config",
-	"/etc/config/test_uci2_node_list_add_config",
-	"/etc/config/test_uci2_node_list_element_add_config",
-	"/etc/config/test_sync",
-	NULL,
-};
+static void test_uci2_config_firewall(void **state);
 
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(test_uci2_node_get),
-		cmocka_unit_test(test_uci2_node_section_add),
-		cmocka_unit_test(test_uci2_node_option_add),
-		cmocka_unit_test(test_uci2_node_list_add),
-		cmocka_unit_test(test_uci2_node_list_element_add),
-		cmocka_unit_test(test_uci2_node_type_get),
-		cmocka_unit_test(test_uci2_node_section_type_get),
-		cmocka_unit_test(test_uci2_node_section_type_set),
-		cmocka_unit_test(test_uci2_node_section_name_get),
-		cmocka_unit_test(test_uci2_node_section_name_set),
-		cmocka_unit_test(test_uci2_node_option_name_get),
-		cmocka_unit_test(test_uci2_node_option_name_set),
-		cmocka_unit_test(test_uci2_node_option_value_get),
-		cmocka_unit_test(test_uci2_node_option_value_set),
-		cmocka_unit_test(test_uci2_node_list_name_get),
-		cmocka_unit_test(test_uci2_node_list_name_set),
-		cmocka_unit_test(test_uci2_node_list_element_value_get),
-		cmocka_unit_test(test_uci2_node_list_element_value_set),
-		cmocka_unit_test(test_uci2_string_to_boolean),
-		cmocka_unit_test(test_uci2_config_parse_success),
-		cmocka_unit_test(test_uci2_config_parse_error),
-		cmocka_unit_test(test_uci2_config_file_change),
-		cmocka_unit_test(test_uci2_node_iterator),
+		cmocka_unit_test_setup_teardown(test_uci2_node_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_section_add, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_option_add, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_add, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_element_add, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_type_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_section_type_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_section_type_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_section_name_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_section_name_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_option_name_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_option_name_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_option_value_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_option_value_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_name_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_name_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_element_value_get, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_list_element_value_set, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_string_to_boolean, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_config_parse_success, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_config_parse_error, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_config_file_change, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_ast_create, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_config_remove, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_node_iterator, setup, teardown),
+		cmocka_unit_test_setup_teardown(test_uci2_config_firewall, setup, teardown),
 	};
 
-	return cmocka_run_group_tests(tests, setup, teardown);
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }
 
 static int setup(void **state)
 {
-	int error = 0;
+	system("mkdir -p " CONFIG_DIRECTORY_PATH_TMP);
+	system("cp " CONFIG_DIRECTORY_PATH "test_config_correct " CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
+	system("cp " CONFIG_DIRECTORY_PATH "test_config_incorrect " CONFIG_DIRECTORY_PATH_TMP "test_config_incorrect");
+	system("cp " CONFIG_DIRECTORY_PATH "test_config_remove " CONFIG_DIRECTORY_PATH_TMP "test_config_remove");
+	system("cp " CONFIG_DIRECTORY_PATH "test_config_iterator " CONFIG_DIRECTORY_PATH_TMP "test_config_iterator");
+	system("cp " CONFIG_DIRECTORY_PATH "test_config_firewall " CONFIG_DIRECTORY_PATH_TMP "test_config_firewall");
 
-	for (size_t i = 0; source_test_file_path[i] != NULL && destination_test_file_path[i] != NULL; i++) {
-		error = file_copy(destination_test_file_path[i], source_test_file_path[i]);
-		if (error) {
-			fprintf(stderr, "file_copy error: ^\n");
-			goto error_out;
-		}
-	}
-
-	goto out;
-
-error_out:
-out:
-	return error;
+	return 0;
 }
 
 static int teardown(void **state)
 {
-	int error = 0;
+	system("rm -rf " CONFIG_DIRECTORY_PATH_TMP);
 
-	for (size_t i = 0; destination_test_file_path[i] != NULL; i++) {
-		error = remove(destination_test_file_path[i]);
-		if (error) {
-			fprintf(stderr, "remove(%s) error (%d): %s\n", destination_test_file_path[i], error, strerror(error));
-			goto error_out;
-		}
-	}
-
-	goto out;
-
-error_out:
-out:
-	return error;
-}
-
-static int file_copy(const char *destination, const char *source)
-{
-	int error = 0;
-	FILE *source_file = NULL;
-	FILE *destination_file = NULL;
-	int character;
-
-	source_file = fopen(source, "r");
-	if (source_file == NULL) {
-		fprintf(stderr, "failed to open source file: %s\n", source);
-		error = -1;
-		goto error_out;
-	}
-
-	destination_file = fopen(destination, "w");
-	if (destination_file == NULL) {
-		fprintf(stderr, "failed to open destination file: %s\n", destination);
-		error = -1;
-		goto error_out;
-	}
-
-	while ((character = fgetc(source_file)) != EOF) {
-		fputc(character, destination_file);
-	}
-
-	goto out;
-
-error_out:
-out:
-	if (source_file) {
-		fclose(source_file);
-	}
-
-	if (destination_file) {
-		fclose(destination_file);
-	}
-
-	return error;
+	return 0;
 }
 
 static void test_uci2_node_get(void **state)
@@ -182,7 +111,7 @@ static void test_uci2_node_get(void **state)
 	uci2_ast_t *uci2_ast = NULL;
 	uci2_node_t *node = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -216,7 +145,7 @@ static void test_uci2_node_section_add(void **state)
 		"new_section_name",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -270,12 +199,12 @@ static void test_uci2_node_section_add(void **state)
 	error = uci2_node_section_add(uci2_ast, root_node, "new_section_type", "new_section_name", &new_section_node);
 	assert_int_not_equal(error, UE_NONE);
 
-	error = uci2_ast_sync(uci2_ast, "test_uci2_node_section_add_config");
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
 	assert_int_equal(error, UE_NONE);
 
 	uci2_ast_destroy(&uci2_ast);
 
-	error = uci2_config_parse("test_uci2_node_section_add_config", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -328,7 +257,7 @@ static void test_uci2_node_option_add(void **state)
 		"ntp",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -408,12 +337,12 @@ static void test_uci2_node_option_add(void **state)
 	assert_int_equal(error, UE_NONE);
 	assert_string_equal(option_value, "false");
 
-	error = uci2_ast_sync(uci2_ast, "test_uci2_node_option_add_config");
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
 	assert_int_equal(error, UE_NONE);
 
 	uci2_ast_destroy(&uci2_ast);
 
-	error = uci2_config_parse("test_uci2_node_option_add_config", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -478,7 +407,7 @@ static void test_uci2_node_list_add(void **state)
 		"ntp",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -552,12 +481,12 @@ static void test_uci2_node_list_add(void **state)
 	assert_int_equal(error, UE_NONE);
 	assert_string_equal(list_name, "server");
 
-	error = uci2_ast_sync(uci2_ast, "test_uci2_node_list_add_config");
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
 	assert_int_equal(error, UE_NONE);
 
 	uci2_ast_destroy(&uci2_ast);
 
-	error = uci2_config_parse("test_uci2_node_list_add_config", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -610,7 +539,7 @@ static void test_uci2_node_list_element_add(void **state)
 	uci2_node_iterator_t *iterator = NULL;
 	uci2_node_t *node_next = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
@@ -672,12 +601,12 @@ static void test_uci2_node_list_element_add(void **state)
 
 	uci2_node_iterator_destroy(&iterator);
 
-	error = uci2_ast_sync(uci2_ast, "test_uci2_node_list_element_add_config");
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
 	assert_int_equal(error, UE_NONE);
 
 	uci2_ast_destroy(&uci2_ast);
 
-	error = uci2_config_parse("test_uci2_node_list_element_add_config", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "@system[1]", "system_list", &list_node);
@@ -711,7 +640,7 @@ static void test_uci2_node_type_get(void **state)
 	uci2_node_t *node = NULL;
 	uci2_node_type_e node_type = UNT_ROOT;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -731,7 +660,7 @@ static void test_uci2_node_section_type_get(void **state)
 	uci2_node_t *node = NULL;
 	const char *type = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", NULL, &node);
@@ -751,7 +680,7 @@ static void test_uci2_node_section_type_set(void **state)
 	uci2_node_t *node = NULL;
 	const char *type = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", NULL, &node);
@@ -778,7 +707,7 @@ static void test_uci2_node_section_name_get(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", NULL, &node);
@@ -798,7 +727,7 @@ static void test_uci2_node_section_name_set(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", NULL, &node);
@@ -825,7 +754,7 @@ static void test_uci2_node_option_name_get(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -845,7 +774,7 @@ static void test_uci2_node_option_name_set(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -872,7 +801,7 @@ static void test_uci2_node_option_value_get(void **state)
 	uci2_node_t *node = NULL;
 	const char *value = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -892,7 +821,7 @@ static void test_uci2_node_option_value_set(void **state)
 	uci2_node_t *node = NULL;
 	const char *value = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -919,7 +848,7 @@ static void test_uci2_node_list_name_get(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "server", &node);
@@ -939,7 +868,7 @@ static void test_uci2_node_list_name_set(void **state)
 	uci2_node_t *node = NULL;
 	const char *name = NULL;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "server", &node);
@@ -975,7 +904,7 @@ static void test_uci2_node_list_element_value_get(void **state)
 		"3.openwrt.pool.ntp.org",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "server", &node);
@@ -1019,7 +948,7 @@ static void test_uci2_node_list_element_value_set(void **state)
 		"test_3",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "server", &node);
@@ -1074,7 +1003,7 @@ static void test_uci2_string_to_boolean(void **state)
 	const char *value = NULL;
 	bool boolean_value = false;
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 
 	error = uci2_node_get(uci2_ast, "ntp", "enabled", &node);
@@ -1129,7 +1058,7 @@ static void test_uci2_config_parse_success(void **state)
 		"3.openwrt.pool.ntp.org",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 	assert_ptr_not_equal(uci2_ast, NULL);
 
@@ -1142,7 +1071,7 @@ static void test_uci2_config_parse_success(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_type_get(node_next, &node_type);
 		assert_int_equal(error, UE_NONE);
@@ -1256,7 +1185,7 @@ static void test_uci2_config_parse_success(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_list_element_value_get(node_next, &list_element_value);
 		assert_int_equal(error, UE_NONE);
@@ -1310,7 +1239,7 @@ static void test_uci2_config_parse_success(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_list_element_value_get(node_next, &list_element_value);
 		assert_int_equal(error, UE_NONE);
@@ -1330,7 +1259,7 @@ static void test_uci2_config_parse_error(void **state)
 	uci2_error_e error = UE_NONE;
 	uci2_ast_t *uci2_ast = NULL;
 
-	error = uci2_config_parse("test_config_incorrect", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_incorrect", &uci2_ast);
 	assert_int_not_equal(error, 0);
 	assert_ptr_equal(uci2_ast, NULL);
 }
@@ -1380,7 +1309,7 @@ static void test_uci2_config_file_change(void **state)
 		"new_list_element_value",
 	};
 
-	error = uci2_config_parse("test_config_correct", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 	assert_ptr_not_equal(uci2_ast, NULL);
 
@@ -1419,7 +1348,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_list_element_value_get(node_next, &list_element_value);
 		assert_int_equal(error, UE_NONE);
@@ -1448,7 +1377,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		error = uci2_node_type_get(node_next, &node_type);
 		assert_int_equal(error, UE_NONE);
 		switch (node_type) {
@@ -1506,7 +1435,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		error = uci2_node_type_get(node_next, &node_type);
 		assert_int_equal(error, UE_NONE);
 		assert_int_equal(node_type, UNT_SECTION);
@@ -1525,7 +1454,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_int_equal(error, UE_NONE);
 	assert_ptr_not_equal(iterator, NULL);
 
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		error = uci2_node_type_get(node_next, &node_type);
 		assert_int_equal(error, UE_NONE);
 		switch (node_type) {
@@ -1548,7 +1477,7 @@ static void test_uci2_config_file_change(void **state)
 				assert_int_equal(error, UE_NONE);
 				assert_ptr_not_equal(list_iterator, NULL);
 
-				while (uci2_node_iterator_next(list_iterator, &list_element_node) == 0) {
+				while (uci2_node_iterator_next(list_iterator, &list_element_node) == UE_NONE) {
 					error = uci2_node_list_element_value_get(list_element_node, &list_element_value);
 					assert_int_equal(error, UE_NONE);
 					assert_string_equal(list_element_value, "new_list_element_value");
@@ -1564,14 +1493,14 @@ static void test_uci2_config_file_change(void **state)
 
 	uci2_node_iterator_destroy(&iterator);
 
-	error = uci2_ast_sync(uci2_ast, "test_sync");
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_correct");
 	assert_int_equal(error, UE_NONE);
 
 	uci2_ast_destroy(&uci2_ast);
 
-	// parse the file again after writing it to test_sync
+	// parse the file again after writing the new configuration
 
-	error = uci2_config_parse("test_sync", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_correct", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 	assert_ptr_not_equal(uci2_ast, NULL);
 
@@ -1584,7 +1513,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		error = uci2_node_section_type_get(node_next, &section_type);
 		assert_int_equal(error, UE_NONE);
 		assert_string_equal(section_type, section_type_match[index]);
@@ -1622,7 +1551,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_list_element_value_get(node_next, &list_element_value);
 		assert_int_equal(error, UE_NONE);
@@ -1657,7 +1586,7 @@ static void test_uci2_config_file_change(void **state)
 	assert_ptr_not_equal(iterator, NULL);
 
 	index = 0;
-	while (uci2_node_iterator_next(iterator, &node_next) == 0) {
+	while (uci2_node_iterator_next(iterator, &node_next) == UE_NONE) {
 		assert_ptr_not_equal(node_next, NULL);
 		error = uci2_node_list_element_value_get(node_next, &list_element_value);
 		assert_int_equal(error, UE_NONE);
@@ -1668,6 +1597,126 @@ static void test_uci2_config_file_change(void **state)
 	}
 
 	uci2_node_iterator_destroy(&iterator);
+
+	uci2_ast_destroy(&uci2_ast);
+}
+
+static void test_uci2_config_remove(void **state)
+{
+	uci2_error_e error = UE_NONE;
+	uci2_ast_t *uci2_ast = NULL;
+
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_remove", &uci2_ast);
+	assert_int_equal(error, UE_NONE);
+
+	uci2_ast_destroy(&uci2_ast);
+
+	error = uci2_config_remove(CONFIG_DIRECTORY_PATH_TMP "test_config_remove");
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_remove", &uci2_ast);
+	assert_int_equal(error, UE_FILE_NOT_FOUND);
+}
+
+static void test_uci2_ast_create(void **state)
+{
+	uci2_error_e error = UE_NONE;
+	uci2_ast_t *uci2_ast = NULL;
+	uci2_node_t *root_node = NULL;
+	uci2_node_t *section_node = NULL;
+	uci2_node_t *option_node = NULL;
+	uci2_node_t *list_node = NULL;
+	uci2_node_t *list_element_node = NULL;
+	uci2_node_iterator_t *option_iterator = NULL;
+	uci2_node_t *option_next = NULL;
+	uci2_node_type_e node_type = UNT_ROOT;
+	const char *option_name = NULL;
+	const char *option_value = NULL;
+	uci2_node_iterator_t *list_element_iterator = NULL;
+	uci2_node_t *list_element_next = NULL;
+	size_t list_element_index = 0;
+	const char *list_element_value = NULL;
+	const char *list_element_value_match[] = {
+		"item 1",
+		"item 2",
+	};
+
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_create", &uci2_ast);
+	assert_int_equal(error, UE_FILE_NOT_FOUND);
+
+	error = uci2_ast_create(&uci2_ast);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_section_add(uci2_ast, root_node, "interface", "test", &section_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_option_add(uci2_ast, section_node, "name", "eth0", &option_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_list_add(uci2_ast, section_node, "items", &list_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_list_element_add(uci2_ast, list_node, "item 1", &list_element_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_list_element_add(uci2_ast, list_node, "item 2", &list_element_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_ast_sync(uci2_ast, CONFIG_DIRECTORY_PATH_TMP "test_config_create");
+	assert_int_equal(error, UE_NONE);
+
+	uci2_ast_destroy(&uci2_ast);
+
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_create", &uci2_ast);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_get(uci2_ast, "test", NULL, &section_node);
+	assert_int_equal(error, UE_NONE);
+
+	error = uci2_node_iterator_new(section_node, &option_iterator);
+	assert_int_equal(error, UE_NONE);
+
+	while (uci2_node_iterator_next(option_iterator, &option_next) == UE_NONE) {
+		error = uci2_node_type_get(option_next, &node_type);
+		switch (node_type) {
+			case UNT_OPTION:
+				error = uci2_node_option_name_get(option_next, &option_name);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(option_name, "name");
+
+				error = uci2_node_option_value_get(option_next, &option_value);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(option_value, "eth0");
+				break;
+
+			case UNT_LIST:
+				error = uci2_node_list_name_get(option_next, &option_name);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(option_name, "items");
+
+				error = uci2_node_iterator_new(option_next, &list_element_iterator);
+				assert_int_equal(error, UE_NONE);
+
+				list_element_index = 0;
+				while (uci2_node_iterator_next(list_element_iterator, &list_element_next) == UE_NONE) {
+					error = uci2_node_list_element_value_get(list_element_next, &list_element_value);
+					assert_int_equal(error, UE_NONE);
+					assert_string_equal(list_element_value, list_element_value_match[list_element_index]);
+					list_element_index++;
+				}
+
+				uci2_node_iterator_destroy(&list_element_iterator);
+				break;
+
+			default:
+				abort();
+		}
+	}
+
+	uci2_node_iterator_destroy(&option_iterator);
 
 	uci2_ast_destroy(&uci2_ast);
 }
@@ -1814,7 +1863,7 @@ static void test_uci2_node_iterator(void **state)
 		"143/0",
 	};
 
-	error = uci2_config_parse("test_config_iterator", &uci2_ast);
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_iterator", &uci2_ast);
 	assert_int_equal(error, UE_NONE);
 	assert_ptr_not_equal(uci2_ast, NULL);
 
@@ -1827,7 +1876,7 @@ static void test_uci2_node_iterator(void **state)
 	assert_ptr_not_equal(section_iterator, NULL);
 
 	section_index = 0;
-	while (uci2_node_iterator_next(section_iterator, &section_next) == 0) {
+	while (uci2_node_iterator_next(section_iterator, &section_next) == UE_NONE) {
 		error = uci2_node_type_get(section_next, &section_node_type);
 		assert_int_equal(error, UE_NONE);
 		assert_int_equal(section_node_type, UNT_SECTION);
@@ -1844,7 +1893,7 @@ static void test_uci2_node_iterator(void **state)
 		assert_ptr_not_equal(option_iterator, NULL);
 
 		option_index = 0;
-		while (uci2_node_iterator_next(option_iterator, &option_next) == 0) {
+		while (uci2_node_iterator_next(option_iterator, &option_next) == UE_NONE) {
 			switch (section_index) {
 				case 0:
 					error = uci2_node_type_get(option_next, &option_node_type);
@@ -1939,7 +1988,7 @@ static void test_uci2_node_iterator(void **state)
 							assert_int_equal(error, UE_NONE);
 
 							list_element_index = 0;
-							while (uci2_node_iterator_next(list_element_iterator, &list_element_next) == 0) {
+							while (uci2_node_iterator_next(list_element_iterator, &list_element_next) == UE_NONE) {
 								error = uci2_node_type_get(list_element_next, &list_element_node_type);
 								assert_int_equal(error, UE_NONE);
 								assert_int_equal(list_element_node_type, UNT_LIST_ELEMENT);
@@ -1969,6 +2018,322 @@ static void test_uci2_node_iterator(void **state)
 		uci2_node_iterator_destroy(&option_iterator);
 
 		section_index++;
+	}
+
+	uci2_node_iterator_destroy(&section_iterator);
+
+	uci2_ast_destroy(&uci2_ast);
+}
+
+static void test_uci2_config_firewall(void **state)
+{
+	uci2_error_e error = UE_NONE;
+	uci2_ast_t *uci2_ast = NULL;
+	uci2_node_t *root_node = NULL;
+	uci2_node_iterator_t *section_iterator = NULL;
+	size_t index = 0;
+	uci2_node_t *node_next = NULL;
+	uci2_node_type_e node_type = UNT_ROOT;
+	const char *section_type = NULL;
+	const char *section_name = NULL;
+	const char *section_type_match[] = {
+		"defaults",
+		"zone",
+		"zone",
+		"forwarding",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"include",
+		"redirect",
+		"redirect",
+		"redirect",
+	};
+	const char *section_name_match[] = {
+		"@defaults[0]",
+		"@zone[0]",
+		"@zone[1]",
+		"@forwarding[0]",
+		"@rule[0]",
+		"@rule[1]",
+		"@rule[2]",
+		"@rule[3]",
+		"@rule[4]",
+		"@rule[5]",
+		"@rule[6]",
+		"@rule[7]",
+		"@rule[8]",
+		"@rule[9]",
+		"@rule[10]",
+		"@rule[11]",
+		"@rule[12]",
+		"@rule[13]",
+		"@include[0]",
+		"@redirect[0]",
+		"@redirect[1]",
+		"@redirect[2]",
+	};
+	uci2_node_t *section_node = NULL;
+	uci2_node_iterator_t *option_iterator = NULL;
+	size_t option_index = 0;
+	size_t list_element_index = 0;
+	uci2_node_t *option_node_next = NULL;
+	const char *option_name = NULL;
+	const char *option_value = NULL;
+	const char *option_name_match[] = {
+		"name",
+		"src",
+		"dest",
+		"proto",
+		"limit",
+		"family",
+		"target",
+	};
+	const char *option_value_match[] = {
+		"Allow-ICMPv6-Forward",
+		"wan",
+		"*",
+		"icmp",
+		"1000/sec",
+		"ipv6",
+		"ACCEPT",
+	};
+	const char *list_name = NULL;
+	uci2_node_iterator_t *list_element_iterator = NULL;
+	uci2_node_t *list_element_node_next = NULL;
+	const char *list_element_value = NULL;
+	const char *list_element_value_match[] = {
+		"echo-request",
+		"echo-reply",
+		"destination-unreachable",
+		"packet-too-big",
+		"time-exceeded",
+		"bad-header",
+		"unknown-header-type",
+	};
+	uci2_node_t *option_node = NULL;
+	const char *section_type_after_delete_match[] = {
+		"defaults",
+		"zone",
+		"zone",
+		"forwarding",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"rule",
+		"include",
+		"redirect",
+		"redirect",
+	};
+	const char *section_name_after_delete_match[] = {
+		"@defaults[0]",
+		"@zone[0]",
+		"@zone[1]",
+		"@forwarding[0]",
+		"@rule[0]",
+		"@rule[1]",
+		"@rule[2]",
+		"@rule[3]",
+		"@rule[4]",
+		"@rule[5]",
+		"@rule[6]",
+		"@rule[7]",
+		"@rule[8]",
+		"@rule[9]",
+		"@rule[10]",
+		"@rule[11]",
+		"@rule[12]",
+		"@rule[13]",
+		"@include[0]",
+		"@redirect[0]",
+		"@redirect[2]",
+	};
+
+	error = uci2_config_parse(CONFIG_DIRECTORY_PATH_TMP "test_config_firewall", &uci2_ast);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(uci2_ast, NULL);
+
+	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(root_node, NULL);
+
+	error = uci2_node_iterator_new(root_node, &section_iterator);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(section_iterator, NULL);
+
+	index = 0;
+	while (uci2_node_iterator_next(section_iterator, &node_next) == UE_NONE) {
+		assert_ptr_not_equal(node_next, NULL);
+		error = uci2_node_type_get(node_next, &node_type);
+		assert_int_equal(error, UE_NONE);
+		assert_int_equal(node_type, UNT_SECTION);
+
+		error = uci2_node_section_type_get(node_next, &section_type);
+		assert_int_equal(error, UE_NONE);
+		assert_ptr_not_equal(section_type, NULL);
+		assert_string_equal(section_type, section_type_match[index]);
+
+		error = uci2_node_section_name_get(node_next, &section_name);
+		assert_int_equal(error, UE_NONE);
+		assert_ptr_not_equal(section_name, NULL);
+		assert_string_equal(section_name, section_name_match[index]);
+
+		index++;
+	}
+
+	uci2_node_iterator_destroy(&section_iterator);
+
+	error = uci2_node_get(uci2_ast, "@rule[6]", NULL, &section_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(section_node, NULL);
+
+	error = uci2_node_iterator_new(section_node, &option_iterator);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(option_iterator, NULL);
+
+	option_index = 0;
+	while (uci2_node_iterator_next(option_iterator, &option_node_next) == UE_NONE) {
+		assert_ptr_not_equal(option_node_next, NULL);
+		error = uci2_node_type_get(option_node_next, &node_type);
+		assert_int_equal(error, UE_NONE);
+		switch (node_type) {
+			case UNT_OPTION:
+				error = uci2_node_option_name_get(option_node_next, &option_name);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(option_name, option_name_match[option_index]);
+
+				error = uci2_node_option_value_get(option_node_next, &option_value);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(option_value, option_value_match[option_index]);
+
+				option_index++;
+				break;
+
+			case UNT_LIST:
+				error = uci2_node_list_name_get(option_node_next, &list_name);
+				assert_int_equal(error, UE_NONE);
+				assert_string_equal(list_name, "icmp_type");
+
+				error = uci2_node_iterator_new(option_node_next, &list_element_iterator);
+				assert_int_equal(error, UE_NONE);
+				assert_ptr_not_equal(list_element_iterator, NULL);
+
+				list_element_index = 0;
+				while (uci2_node_iterator_next(list_element_iterator, &list_element_node_next) == UE_NONE) {
+					error = uci2_node_list_element_value_get(list_element_node_next, &list_element_value);
+					assert_int_equal(error, UE_NONE);
+					assert_ptr_not_equal(list_element_value, NULL);
+					assert_string_equal(list_element_value, list_element_value_match[list_element_index]);
+					list_element_index++;
+				}
+
+				uci2_node_iterator_destroy(&list_element_iterator);
+
+				break;
+
+			default:
+				abort();
+		}
+
+		uci2_node_iterator_destroy(&option_iterator);
+	}
+
+	error = uci2_node_get(uci2_ast, "@redirect[1]", "src_dport", &option_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(option_node, NULL);
+
+	error = uci2_node_option_value_get(option_node, &option_value);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(option_value, NULL);
+	assert_string_equal(option_value, "22001");
+
+	error = uci2_node_get(uci2_ast, "@redirect[2]", "src_dport", &option_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(option_node, NULL);
+
+	error = uci2_node_option_value_get(option_node, &option_value);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(option_value, NULL);
+	assert_string_not_equal(option_value, "22001");
+	assert_string_equal(option_value, "80");
+
+	uci2_node_remove(option_node);
+
+	error = uci2_node_get(uci2_ast, "@redirect[2]", "src_dport", &option_node);
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_get(uci2_ast, "@redirect[1]", NULL, &section_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(section_node, NULL);
+
+	uci2_node_remove(section_node);
+
+	error = uci2_node_section_type_get(section_node, &section_type);
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_section_type_set(section_node, "test_type");
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_section_name_get(section_node, &section_type);
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_section_name_set(section_node, "test_name");
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_get(uci2_ast, "@redirect[1]", NULL, &section_node);
+	assert_int_equal(error, UE_NODE_NOT_FOUND);
+
+	error = uci2_node_get(uci2_ast, "@redirect[2]", NULL, &section_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(section_node, NULL);
+
+	error = uci2_node_get(uci2_ast, NULL, NULL, &root_node);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(root_node, NULL);
+
+	error = uci2_node_iterator_new(root_node, &section_iterator);
+	assert_int_equal(error, UE_NONE);
+	assert_ptr_not_equal(section_iterator, NULL);
+
+	index = 0;
+	while (uci2_node_iterator_next(section_iterator, &node_next) == UE_NONE) {
+		assert_ptr_not_equal(node_next, NULL);
+		error = uci2_node_type_get(node_next, &node_type);
+		assert_int_equal(error, UE_NONE);
+		assert_int_equal(node_type, UNT_SECTION);
+
+		error = uci2_node_section_type_get(node_next, &section_type);
+		assert_int_equal(error, UE_NONE);
+		assert_ptr_not_equal(section_type, NULL);
+		assert_string_equal(section_type, section_type_after_delete_match[index]);
+
+		error = uci2_node_section_name_get(node_next, &section_name);
+		assert_int_equal(error, UE_NONE);
+		assert_ptr_not_equal(section_name, NULL);
+		assert_string_equal(section_name, section_name_after_delete_match[index]);
+
+		index++;
 	}
 
 	uci2_node_iterator_destroy(&section_iterator);

@@ -1667,7 +1667,8 @@ uci2_error_e uci2_string_to_boolean(const char *string_value, bool *out)
 		goto error_out;
 	}
 
-	if (strcmp(string_value, "0") == 0 || strcmp(string_value, "no") == 0 ||
+	if (strcmp(string_value, "0") == 0 ||
+		strcmp(string_value, "no") == 0 ||
 		strcmp(string_value, "off") == 0 ||
 		strcmp(string_value, "false") == 0 ||
 		strcmp(string_value, "disabled") == 0) {

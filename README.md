@@ -31,3 +31,7 @@ sudo make install
 ```
 
 If you made changes to the `uci2_cfg.l` and/or `uci2_cfg.y` files you need to regenerate the lexer and parser code by running the script `scripts/gen_grammar.sh` which runs the relevant `flex` and `bison` commands and then you can rebuild and reinstall the library using the steps above.
+
+## API documentation
+
+The uci2 API documentation is available [here](API.md).

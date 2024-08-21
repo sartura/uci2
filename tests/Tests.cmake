@@ -45,3 +45,4 @@ set_tests_properties(
 
 file(GLOB CONFIGURATION_FILES tests/files/*)
 file(COPY ${CONFIGURATION_FILES} DESTINATION ${CMAKE_BINARY_DIR}/tests)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DCONFIG_DIRECTORY_PATH="${CMAKE_BINARY_DIR}/tests/")
